@@ -6,7 +6,7 @@ Features:
 - imports .agr through afx-blender-scripts
 - selects all keyframes available
 - deletes Physics(everything with the name "physics" in it)
-- renames the parent-object(afx.*) to root and exports it with its childrens as FBX
+- renames the parent-object(afx.*) to root and exports it with childrens as FBX
 - exports afxCam as single FBX file
 
 Installation:
@@ -31,6 +31,10 @@ If you want to do other customisations and delete some models or use not all key
 then you can use the File->Export->AGR Export FBX, which will only delete physics and
 export every model with its childrens.
 
+Known Issue:
+
+If you select the Output folder of the "AGR Export FBX" and you need to only have data in the file path window 
+and have nothing in the file name window below. Otherwise it will produce an error, that it can't find the choosen path.
 
 
 Changelog:
@@ -38,3 +42,9 @@ Changelog:
 v1.0.0(04.06.2018)
 - Added "All-in-one" Addon into Import
 - Added "only Export" Addon into Export
+
+v1.0.1(05.06.2018)
+- Added "add_leaf_bones=False" to FBX Export (thx to Devostated.)
+- Optimized the Keyfranes_end to set to the end of the animation
+- Fixed "Preserve SMD Polygons & Normals" being set to always False
+- Added check if "AfxCam" is present in the "All-in-one" Addon
