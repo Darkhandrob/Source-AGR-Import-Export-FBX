@@ -1,15 +1,11 @@
 # CSGO-AGR-Import-Export-FBX
 Addon for Blender to export csgo's AGR to FBX files for UE4
 
-Description:
-This addon for Blender reduces the amount of work to import csgo's agr and export every model in it as a fbx,
-so you can open it in unreal engine 4.
-
 Features:
 - imports .agr through afx-blender-scripts
 - selects all keyframes available
 - deletes Physics(everything with the name "physics" in it)
-- renames the parent-object(afx.*) to root and exports it with childrens as FBX
+- renames the parent-object(afx.*) to root and exports it with its childrens as FBX
 - exports afxCam as single FBX file
 
 Installation:
