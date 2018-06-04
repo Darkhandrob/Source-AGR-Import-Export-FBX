@@ -8,7 +8,10 @@ Features:
 - renames the parent-object(afx.*) to root and exports it with its childrens as FBX
 - exports afxCam as single FBX file
 
+[Download it on the release page](https://github.com/Darkhandrob/CSGO-AGR-Import-Export-FBX/releases)
+
 Installation:
+
 You first need to install Blender Source Tools
 ( http://steamreview.org/BlenderSourceTools/ ) and HLAE's afx-blender-scripts
 ( https://github.com/advancedfx/afx-blender-scripts/releases )
