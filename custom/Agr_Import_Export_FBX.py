@@ -1,7 +1,7 @@
 # AGR-FBX Export Script by Darkhand
 # https://www.youtube.com/user/Darkhandrob
 # https://twitter.com/Darkhandrob
-# Last change: 04.06.2018
+# Last change: 05.06.2018
 
 import bpy
 
@@ -59,7 +59,7 @@ class ImpExportAgr(bpy.types.Operator):
 	skipRemDoubles = bpy.props.BoolProperty(
 		name="Preserve SMD Polygons & Normals",
 		description="Import raw (faster), disconnected polygons from SMD files; these are harder to edit but a closer match to the original mesh",
-		default=False
+		default=True
 	)
 	exportingPath = bpy.props.StringProperty(
 		name="Export Path",
@@ -81,7 +81,7 @@ class ImpExportAgr(bpy.types.Operator):
 			interKey =self.interKey,
 			global_scale = self.global_scale,
 			scaleInvisibleZero=self.scaleInvisibleZero,
-			skipRemDoubles=False
+			skipRemDoubles=self.skipRemDoubles
 		)
 		
 		# save all objects from list into array
@@ -97,8 +97,7 @@ class ImpExportAgr(bpy.types.Operator):
 		for x in range(number_of_objects):
 			if allobjectslist[x].name.find("afx.") != -1:
 				#select all keyframes
-				if bpy.data.scenes[0].frame_end < allobjectslist[x].animation_data.action.frame_range[1]:
-					bpy.data.scenes[0].frame_end = allobjectslist[x].animation_data.action.frame_range[1]
+				bpy.data.scenes[0].frame_end = allobjectslist[x].animation_data.action.frame_range[1]
 				# select root
 				allobjectslist[x].select = True
 				# select childrens
@@ -110,7 +109,14 @@ class ImpExportAgr(bpy.types.Operator):
 				allobjectslist[x].name = "root"
 				# export single object as fbx
 				fullfiles = self.exportingPath + "/" + current_object_name + ".fbx"
-				bpy.ops.export_scene.fbx(filepath = fullfiles, use_selection = True, bake_anim_use_nla_strips = False, bake_anim_use_all_actions = False, bake_anim_simplify_factor = 0)
+				bpy.ops.export_scene.fbx(
+					filepath = fullfiles, 
+					use_selection = True, 
+					bake_anim_use_nla_strips = False, 
+					bake_anim_use_all_actions = False, 
+					bake_anim_simplify_factor = 0,
+					add_leaf_bones=False
+					)
 				# undo all changes
 				allobjectslist[x].name = current_object_name
 				allobjectslist[x].select = False
@@ -118,10 +124,17 @@ class ImpExportAgr(bpy.types.Operator):
 					allobjectslist[x].children[y].select = False
 					
 		#export camera
-		bpy.data.objects["afxCam"].select = True
-		fullfiles_cam = self.exportingPath + "/afxcam.fbx"
-		bpy.ops.export_scene.fbx(filepath = fullfiles_cam, use_selection = True, bake_anim_use_nla_strips = False, bake_anim_use_all_actions = False, bake_anim_simplify_factor = 0)
-		bpy.data.objects["afxCam"].select = False
+		if bpy.data.objects.find("afxCam") != -1:
+			bpy.data.objects["afxCam"].select = True
+			fullfiles_cam = self.exportingPath + "/afxcam.fbx"
+			bpy.ops.export_scene.fbx(
+				filepath = fullfiles_cam, 
+				use_selection = True, 
+				bake_anim_use_nla_strips = False, 
+				bake_anim_use_all_actions = False, 
+				bake_anim_simplify_factor = 0,
+				add_leaf_bones=False)
+			bpy.data.objects["afxCam"].select = False
 		
 		print ("FBX-Export script finished")
 		return {'FINISHED'} 
