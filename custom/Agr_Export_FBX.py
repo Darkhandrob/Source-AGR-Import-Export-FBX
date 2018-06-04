@@ -1,7 +1,7 @@
 # AGR-FBX Export Script by Darkhand
 # https://www.youtube.com/user/Darkhandrob
 # https://twitter.com/Darkhandrob
-# Last change: 04.06.2018
+# Last change: 05.06.2018
 
 import bpy
 
@@ -13,8 +13,6 @@ class ExportAgr(bpy.types.Operator):
 	
 	# Properties used by the file browser
 	filepath = bpy.props.StringProperty(subtype="DIR_PATH")
-	filename_ext = ".agr"
-	filter_glob = bpy.props.StringProperty(default="*.agr", options={'HIDDEN'})
 	
 	def menu_draw_export(self, context):
 		layout = self.layout
@@ -51,7 +49,13 @@ class ExportAgr(bpy.types.Operator):
 				allobjectslist[x].name = "root"
 				# export single object as fbx
 				fullfiles = self.filepath + "/" + current_object_name + ".fbx"
-				bpy.ops.export_scene.fbx(filepath = fullfiles, use_selection = True, bake_anim_use_nla_strips = False, bake_anim_use_all_actions = False, bake_anim_simplify_factor = 0)
+				bpy.ops.export_scene.fbx(
+                    filepath = fullfiles, 
+                    use_selection = True, 
+                    bake_anim_use_nla_strips = False, 
+                    bake_anim_use_all_actions = False, 
+                    bake_anim_simplify_factor = 0,
+                    add_leaf_bones=False)
 				# undo all changes
 				allobjectslist[x].name = current_object_name
 				allobjectslist[x].select = False
@@ -62,20 +66,26 @@ class ExportAgr(bpy.types.Operator):
 			if allobjectslist[x].name.find("afxCam") != -1:
 				bpy.data.objects["afxCam"].select = True
 				fullfiles = self.filepath + "/afxcam.fbx"
-				bpy.ops.export_scene.fbx(filepath = fullfiles, use_selection = True, bake_anim_use_nla_strips = False, bake_anim_use_all_actions = False, bake_anim_simplify_factor = 0)
+				bpy.ops.export_scene.fbx(
+                    filepath = fullfiles, 
+                    use_selection = True, 
+                    bake_anim_use_nla_strips = False, 
+                    bake_anim_use_all_actions = False, 
+                    bake_anim_simplify_factor = 0,
+                    add_leaf_bones=False)
 		
 		print ("FBX-Export script finished")
 		return {'FINISHED'} 
 
 def register():
-	bpy.utils.register_class(Agr_Export_FBX.ExportAgr)
+	bpy.utils.register_class(ExportAgr)
 	bpy.types.INFO_MT_file_export.append(ExportAgr.menu_draw_export)
 	
 def unregister():
 	bpy.types.INFO_MT_file_export.remove(ExportAgr.menu_draw_export)
-	bpy.utils.unregister_class(Agr_Export_FBX.ExportAgr)
+	bpy.utils.unregister_class(ExportAgr)
 		
 # This allows you to run the script directly from blenders text editor
 # to test the addon without having to install it.
 if __name__ == "__main__":
-	register()
+    register()
