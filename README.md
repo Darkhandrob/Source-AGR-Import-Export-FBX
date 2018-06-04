@@ -17,7 +17,7 @@ You first need to install Blender Source Tools
 After that you can install and activate this addon.
 
 
-## Usage for "AGR Import and Export FBX":
+### Usage for "AGR Import and Export FBX":
 Delete everything in the scene(a->x), change the Frame Rate to 60 or whatever you recorded.
 Then open File->Import->AGR Import and Export FBX.
 Input the Path to the CSGO Folder with decompiled models and a Path, where to export it.
@@ -25,7 +25,7 @@ Open Window -> Toggle System Console to check the status of the programm, becaus
 become unresponsive while running the addon.
 Finally open the .agr file and let the programm do its work
 
-## Usage for "AGR Export FBX":
+### Usage for "AGR Export FBX":
 If you want to do other customisations and delete some models or use not all keyframes, 
 then you can use the File->Export->AGR Export FBX, which will only delete physics and
 export every model with its childrens.
