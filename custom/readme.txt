@@ -5,6 +5,7 @@ so you can open it in unreal engine 4.
 Features:
 - imports .agr through afx-blender-scripts
 - selects all keyframes available
+- merging the Run-Animation and Ragdoll-Animation together in one model
 - deletes Physics(everything with the name "physics" in it)
 - renames the parent-object(afx.*) to root and exports it with childrens as FBX
 - exports afxCam as single FBX file
@@ -18,33 +19,35 @@ After that you can install and activate this addon.
 
 Usage for "AGR Import and Export FBX":
 
-Delete everything in the scene(a->x), change the Frame Rate to 60 or whatever you recorded.
-Then open File->Import->AGR Import and Export FBX.
-Input the Path to the CSGO Folder with decompiled models and a Path, where to export it.
-Open Window -> Toggle System Console to check the status of the programm, because it will 
-become unresponsive while running the addon.
-Finally open the .agr file and let the programm do its work
+1.Delete everything in the scene("a"->"x"), change the Frame Rate to 60 or whatever you recorded.
+2.Then open "File"->"Import"->"AGR Import and Export FBX".
+3.Input the Path to the CSGO Folder with decompiled models and a Path, where to export it.
+4.Open "Window" -> "Toggle System Console" to check the status of the programm, because it will 
+  become unresponsive while running the addon.
+5.Finally open the .agr file and let the programm do its work
 
 Usage for "AGR Export FBX":
 
 If you want to do other customisations and delete some models or use not all keyframes, 
-then you can use the File->Export->AGR Export FBX, which will only delete physics and
+then you can use the "File"->"Export"->"AGR Export FBX", which will only delete physics and
 export every model with its childrens.
-
-Known Issue:
-
-If you select the Output folder of the "AGR Export FBX" and you need to only have data in the file path window 
-and have nothing in the file name window below. Otherwise it will produce an error, that it can't find the choosen path.
 
 
 Changelog:
 
 v1.0.0(04.06.2018)
-- Added "All-in-one" Addon into Import
+- Added "all-in-one" Addon into Import
 - Added "only Export" Addon into Export
 
 v1.0.1(05.06.2018)
 - Added "add_leaf_bones=False" to FBX Export (thx to Devostated.)
-- Optimized the Keyfranes_end to set to the end of the animation
+- Optimized the Keyframes_end to set to the end of the animation
 - Fixed "Preserve SMD Polygons & Normals" being set to always False
-- Added check if "AfxCam" is present in the "All-in-one" Addon
+- Added check if "AfxCam" is present in the "all-in-one" Addon
+
+v1.1.0(14.06.2018)
+- Added "MergeInvAnims" Method to "All-in-one"
+- Added Runtime Timer
+- Changed "bpy.ops.object.delete()" to "bpy.data.objects.remove(AllObjectsList[i])" 
+	in the "Deleting Physics" part
+- Fixed Error in "only Export", when a String was inputted into the File Name Box
