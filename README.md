@@ -3,6 +3,7 @@ Addon for Blender to export csgo's AGR to FBX files for UE4
 
 ## Features:
 - imports .agr through afx-blender-scripts
+- merging the Run-Animation and Ragdoll-Animation together in one model
 - selects all keyframes available
 - deletes Physics(everything with the name "physics" in it)
 - renames the parent-object(afx.*) to root and exports it with its childrens as FBX
