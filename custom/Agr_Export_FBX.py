@@ -1,7 +1,7 @@
 # AGR-FBX Export Script by Darkhand
 # https://www.youtube.com/user/Darkhandrob
 # https://twitter.com/Darkhandrob
-# Last change: 14.06.2018
+# Last change: 22.07.2018
 
 import bpy
 import time
@@ -30,31 +30,25 @@ class ExportAgr(bpy.types.Operator):
         # Change Filepath, if something is inputted in the File Name Box
         if not self.filepath.endswith("\\"):
             self.filepath = self.filepath.rsplit(sep="\\", maxsplit=1)[0] + "\\"
-        # save all objects from list into array
-        AllObjectsList = list(bpy.data.objects)
-        NumberOfObjects = len(bpy.data.objects)
-        # delete physics
-        for i in range(NumberOfObjects): 
-            if AllObjectsList[i].name.find("physics") != -1:
-                bpy.data.objects.remove(AllObjectsList[i])
+        # Delete physics
+        for i in bpy.data.objects: 
+            if i.name.find("physics") != -1:
+                bpy.data.objects.remove()
                 
         print("Deleting Physics finished.")
-        AllObjectsList = list(bpy.data.objects)
-        NumberOfObjects = len(bpy.data.objects)
         # select and rename hierarchy objects to root
-        for x in range(NumberOfObjects):
-            if AllObjectsList[x].name.find("afx.") != -1:
+        for CurrentModel in bpy.data.objects:
+            if CurrentModel.name.find("afx.") != -1:
                 # select root
-                AllObjectsList[x].select = True
+                CurrentModel.select = True
                 # select childrens
-                number_of_childrens = len(AllObjectsList[x].children)
-                for y in range(number_of_childrens):
-                    AllObjectsList[x].children[y].select = True
+                for CurrentChildren in CurrentModel.children:
+                    CurrentModel.CurrentChildren.select = True
                 # rename top to root
-                current_object_name = AllObjectsList[x].name
-                AllObjectsList[x].name = "root"
+                CurrentObjectName = CurrentModel.name
+                CurrentModel.name = "root"
                 # export single object as fbx
-                fullfiles = self.filepath + "/" + current_object_name + ".fbx"  
+                fullfiles = self.filepath + "/" + CurrentObjectName + ".fbx"  
                 bpy.ops.export_scene.fbx(
                     filepath = fullfiles, 
                     use_selection = True, 
@@ -63,26 +57,27 @@ class ExportAgr(bpy.types.Operator):
                     bake_anim_simplify_factor = 0,
                     add_leaf_bones=False)
                 # undo all changes
-                AllObjectsList[x].name = current_object_name
-                AllObjectsList[x].select = False
-                for y in range(number_of_childrens):
-                    AllObjectsList[x].children[y].select = False
+                CurrentModel.name = CurrentObjectName
+                CurrentModel.select = False
+                for CurrentChildren in CurrentModel.children:
+                    CurrentModel.CurrentChildren.select = False
 
-            #export camera
-            if AllObjectsList[x].name.find("afxCam") != -1:
-                bpy.data.objects["afxCam"].select = True
-                fullfiles = self.filepath + "/afxcam.fbx"
-                bpy.ops.export_scene.fbx(
-                    filepath = fullfiles, 
-                    use_selection = True, 
-                    bake_anim_use_nla_strips = False, 
-                    bake_anim_use_all_actions = False, 
-                    bake_anim_simplify_factor = 0,
-                    add_leaf_bones=False)
+            # export camera
+        if bpy.data.objects.find("afxCam") != -1:
+            bpy.data.objects["afxCam"].select = True
+            fullfiles = self.filepath + "/afxcam.fbx"
+            bpy.ops.export_scene.fbx(
+                filepath = fullfiles, 
+                use_selection = True, 
+                bake_anim_use_nla_strips = False, 
+                bake_anim_use_all_actions = False, 
+                bake_anim_simplify_factor = 0,
+                add_leaf_bones=False)
+            bpy.data.objects["afxCam"].select = False
                     
         print(" ")
-        print ("FBX-Export script finished in %.4f sec." % (time.time() - time_start))
-        return {'FINISHED'} 
+        print ("FBX-Export Script finished in %.4f sec." % (time.time() - time_start))
+        return {'FINISHED'}
 
 def register():
     bpy.utils.register_class(ExportAgr)
