@@ -1,6 +1,6 @@
 Description:
 This addon for Blender reduces the amount of work to import csgo's agr and export every model in it as a fbx,
-so you can open it in unreal engine 4.
+so you can open it in Unreal Engine 4.
 
 Features:
 - imports .agr through afx-blender-scripts
@@ -9,6 +9,7 @@ Features:
 - deletes Physics(everything with the name "physics" in it)
 - renames the parent-object(afx.*) to root and exports it with childrens as FBX
 - exports afxCam as single FBX file
+- convert whole csgo model-folders to FBX for UE4
 
 Installation:
 You first need to install Blender Source Tools
@@ -46,8 +47,13 @@ v1.0.1(05.06.2018)
 - Added check if "AfxCam" is present in the "all-in-one" Addon
 
 v1.1.0(14.06.2018)
-- Added "MergeInvAnims" Method to "All-in-one"
+- Added "MergeInvAnims" Function to "All-in-one"
 - Added Runtime Timer
 - Changed "bpy.ops.object.delete()" to "bpy.data.objects.remove(AllObjectsList[i])" 
 	in the "Deleting Physics" part
-- Fixed Error in "only Export", when a String was inputted into the File Name Box
+- Fixed Error in "only Export", when a String was input into the File Name Box
+
+v1.2.0(28.07.2018)
+- Added "CSGO Model Converter"
+- Optimized for-Loops in both Scripts
+- "all-in-one" now creates a folder to which the script will export the models
