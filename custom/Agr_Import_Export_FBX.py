@@ -1,10 +1,11 @@
-# AGR-FBX Export Script by Darkhand
+# AGR-FBX Import and Export Script by Darkhand
 # https://www.youtube.com/user/Darkhandrob
 # https://twitter.com/Darkhandrob
-# Last change: 14.06.2018
+# Last change: 22.07.2018
 
 import bpy
 import time
+import os
 
 class ImpExportAgr(bpy.types.Operator):
     """CSGO AGR Importer-Exporter"""      # blender will use this as a tooltip for menu items and buttons.
@@ -69,29 +70,27 @@ class ImpExportAgr(bpy.types.Operator):
     )
     
     def MergeInvAnims(self, context):
-        AllObjectsList = list(bpy.data.objects)
-        NumberOfObjects = len(bpy.data.objects)
         # Ragdollanimation .hide_render is set as True at Frame 1
         # But if he was killed before starting recording, it is also the Ragdoll is False and Run is True
         # Each Type of Model gets its own Array inside the Array
         PlayerAnimations = []
-        for x in range(NumberOfObjects):
+        for CurrentModel in bpy.data.objects:
             # Find parents
-            if AllObjectsList[x].name.find("afx.") != -1:
+            if CurrentModel.name.find("afx.") != -1:
                 # Find Player Models
-                if AllObjectsList[x].name.find("tm") != -1:
+                if CurrentModel.name.find("tm") != -1:
                     # Test first and last Keyframe to get RunAnimation
                     bpy.context.scene.frame_set(1.0)
-                    if AllObjectsList[x].hide_render == False:    
-                        bpy.context.scene.frame_set(AllObjectsList[x].animation_data.action.frame_range[1])
-                        if AllObjectsList[x].hide_render == True:
+                    if CurrentModel.hide_render == False:    
+                        bpy.context.scene.frame_set(CurrentModel.animation_data.action.frame_range[1])
+                        if CurrentModel.hide_render == True:
                             # Find RagdollAnimation
-                            for y in range(NumberOfObjects):
-                                if AllObjectsList[x].name.find("afx.") != -1:
-                                    if AllObjectsList[y].name.find(AllObjectsList[x].name.split()[1]) != -1:
+                            for CurrentSecondModel in bpy.data.objects:
+                                if CurrentModel.name.find("afx.") != -1:
+                                    if CurrentSecondModel.name.find(CurrentModel.name.split()[1]) != -1:
                                         # Dont use the same object-model
-                                        if AllObjectsList[y].name.find(AllObjectsList[x].name.split()[0]) == -1:
-                                            PlayerAnimations.append([AllObjectsList[x],AllObjectsList[y]])  
+                                        if CurrentSecondModel.name.find(CurrentModel.name.split()[0]) == -1:
+                                            PlayerAnimations.append([CurrentModel,CurrentSecondModel])  
                                                           
         # Edit Animation-strips
         for i in range(len(PlayerAnimations)):
@@ -120,11 +119,11 @@ class ImpExportAgr(bpy.types.Operator):
         context.window_manager.fileselect_add(self)
         return {'RUNNING_MODAL'}
     
-    # main funktion
+    # Main funktion
     def execute(self, context):
         # Timing Runtime
         time_start = time.time()
-        #import agr with input filepath
+        # Import agr with input filepath
         bpy.ops.advancedfx.agr_importer(
             filepath=self.filepath,
             assetPath=self.assetPath,
@@ -133,37 +132,36 @@ class ImpExportAgr(bpy.types.Operator):
             scaleInvisibleZero=self.scaleInvisibleZero,
             skipRemDoubles=self.skipRemDoubles
         )
-        # execute method
+        # Create Directory
+        NewExportPath = os.path.join(self.exportingPath, bpy.path.display_name_from_filepath(self.filepath))
+        os.makedirs(name=NewExportPath, exist_ok=True)
+        self.exportingPath = NewExportPath
+        
+        # Execute method
         self.MergeInvAnims(context)
-        # save all objects from list into array
-        AllObjectsList = list(bpy.data.objects)
-        NumberOfObjects = len(bpy.data.objects)
-        # delete physics(maybe include into merge_anim class for runtime)
-        for i in range(NumberOfObjects): 
-            if AllObjectsList[i].name.find("physics") != -1:
-                bpy.data.objects.remove(AllObjectsList[i])
+        # Delete physics(maybe include into merge_anim class for runtime)
+        for CurrentModel in bpy.data.objects: 
+            if CurrentModel.name.find("physics") != -1:
+                bpy.data.objects.remove(CurrentModel)
+                
         print("Deleting Physics finished.")
-        # select and rename hierarchy objects to root
-        AllObjectsList = list(bpy.data.objects)
-        NumberOfObjects = len(bpy.data.objects)
-        for x in range(NumberOfObjects):
-            if AllObjectsList[x].name.find("afx.") != -1:
+        for CurrentModel in bpy.data.objects:
+            if CurrentModel.name.find("afx.") != -1:
                 #select all keyframes
-                if AllObjectsList[x].name.find("RunAndDeathAnim") != -1:
-                    bpy.context.scene.frame_end = AllObjectsList[x].animation_data.nla_tracks[0].strips[1].action_frame_end
+                if CurrentModel.name.find("RunAndDeathAnim") != -1:
+                    bpy.context.scene.frame_end = CurrentModel.animation_data.nla_tracks[0].strips[1].action_frame_end
                 else:
-                    bpy.context.scene.frame_end = AllObjectsList[x].animation_data.action.frame_range[1]
+                    bpy.context.scene.frame_end = CurrentModel.animation_data.action.frame_range[1]
                 # select root
-                AllObjectsList[x].select = True
+                CurrentModel.select = True
                 # select childrens
-                number_of_childrens = len(AllObjectsList[x].children)
-                for y in range(number_of_childrens):
-                    AllObjectsList[x].children[y].select = True
+                for CurrentChildren in CurrentModel.children:
+                    CurrentChildren.select = True
                 # rename top to root
-                current_object_name = AllObjectsList[x].name
-                AllObjectsList[x].name = "root"
+                CurrentObjectName = CurrentModel.name
+                CurrentModel.name = "root"
                 # export single object as fbx
-                fullfiles = self.exportingPath + "/" + current_object_name + ".fbx"
+                fullfiles = self.exportingPath + "/" + CurrentObjectName + ".fbx"
                 bpy.ops.export_scene.fbx(
                     filepath = fullfiles, 
                     use_selection = True, 
@@ -173,10 +171,11 @@ class ImpExportAgr(bpy.types.Operator):
                     add_leaf_bones=False
                     )
                 # undo all changes
-                AllObjectsList[x].name = current_object_name
-                AllObjectsList[x].select = False
-                for y in range(number_of_childrens):
-                    AllObjectsList[x].children[y].select = False
+                CurrentModel.name = CurrentObjectName
+                CurrentModel.select = False
+                for CurrentChildren in CurrentModel.children:
+                    CurrentChildren.select = False
+                
         print("Exporting Models finished.")    
         #export camera
         if bpy.data.objects.find("afxCam") != -1:
@@ -190,6 +189,7 @@ class ImpExportAgr(bpy.types.Operator):
                 bake_anim_simplify_factor = 0,
                 add_leaf_bones=False)
             bpy.data.objects["afxCam"].select = False
+            
         print("Exporting Camera Finished.")
         print(" ")
         print ("FBX-Export script finished in %.4f sec." % (time.time() - time_start))
