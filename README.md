@@ -1,5 +1,5 @@
 # CSGO-AGR-Import-Export-FBX (AIOX)
-Addon for Blender to export csgo's AGR to FBX files for UE4
+Addon for Blender to export the recorded AGR-File from HLAE to FBX files for UE4
 
 ## Features:
 - imports .agr through afx-blender-scripts
