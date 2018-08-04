@@ -8,7 +8,7 @@ Addon for Blender to export the recorded AGR-File from HLAE to FBX files for UE4
 - deletes Physics(everything with the name "physics" in it)
 - renames the parent-object(afx.*) to root and exports it with its childrens as FBX
 - exports afxCam as single FBX file
-- convert whole csgo model-folders to FBX for UE4 (has currently a bug, which renames the parent-object to "root.001" and not "root", dont use it)
+- convert whole csgo model-folders to FBX for UE4
 
 ## [Downloads are on the release page](https://github.com/Darkhandrob/CSGO-AGR-Import-Export-FBX/releases)
 
