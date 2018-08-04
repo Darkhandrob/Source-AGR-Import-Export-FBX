@@ -1,7 +1,7 @@
 # CSGO Model Converter to FBX by Darkhand
 # https://www.youtube.com/user/Darkhandrob
 # https://twitter.com/Darkhandrob
-# Last change: 28.07.2018
+# Last change: 04.08.2018
 
 import bpy
 import time
@@ -73,7 +73,7 @@ class CSModelConverter(bpy.types.Operator):
         bpy.ops.import_scene.smd(filepath=QCFile, doAnim=False) 
         for i in bpy.data.objects: 
             # Change name of parent to root
-            if not i.parent:
+            if i.name.endswith("skeleton"):
                 i.name = "root"
             # Delete Physics
             if i.name.find("physics") != -1:
