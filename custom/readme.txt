@@ -33,6 +33,8 @@ If you want to do other customisations and delete some models or use not all key
 then you can use the "File"->"Export"->"AGR Export FBX", which will only delete physics and
 export every model with its childrens.
 
+Important Notice:
+If you get the error:"TypeError: Converting py args to operator properties: : keyword "interKey" unrecognized", you need to update your Blender Source Tools
 
 Changelog:
 
