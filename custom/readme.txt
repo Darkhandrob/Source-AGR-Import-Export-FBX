@@ -57,3 +57,9 @@ v1.2.0(28.07.2018)
 - Added "CSGO Model Converter"
 - Optimized for-Loops in both Scripts
 - "all-in-one" now creates a folder to which the script will export the models
+
+v1.2.1(04.08.2018)
+- Bugfix in "CSGO Model Converter", which renamed the parent-object to "root.001" instead of "root"
+
+v1.2.2(15.08.2018)
+- fixed Bug in "all-in-one", if there are more than one players with the same model

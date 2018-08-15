@@ -1,10 +1,9 @@
 # AGR-FBX Export Script by Darkhand
 # https://www.youtube.com/user/Darkhandrob
 # https://twitter.com/Darkhandrob
-# Last change: 22.07.2018
+# Last change: 15.08.2018
 
-import bpy
-import time
+import bpy,time
 
 class ExportAgr(bpy.types.Operator):
     """CSGO AGR Exporter"""   # blender will use this as a tooltip for menu items and buttons.
@@ -76,7 +75,7 @@ class ExportAgr(bpy.types.Operator):
             bpy.data.objects["afxCam"].select = False
                     
         print(" ")
-        print ("FBX-Export Script finished in %.4f sec." % (time.time() - time_start))
+        print("FBX-Export Script finished in %.4f sec." % (time.time() - time_start))
         return {'FINISHED'}
 
 def register():

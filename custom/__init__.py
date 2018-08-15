@@ -1,13 +1,13 @@
 # AGR-Input-Output-FBX(AIOX) by Darkhand
 # https://www.youtube.com/user/Darkhandrob
 # https://twitter.com/Darkhandrob
-# Last change: 22.07.2018
+# Last change: 15.08.2018
 
 bl_info = {
     "name": "CSGO AGR Importer-Exporter",
     "category": "Import-Export",
     "author": "Darkhand",
-    "version": (1, 2, 0),
+    "version": (1, 2, 2),
     "blender": (2, 79, 0),
     "description": "Imports AGR and Exports every object as a FBX",
     "location": "File > Import/Export"

@@ -1,11 +1,9 @@
 # AGR-FBX Import and Export Script by Darkhand
 # https://www.youtube.com/user/Darkhandrob
 # https://twitter.com/Darkhandrob
-# Last change: 22.07.2018
+# Last change: 15.08.2018
 
-import bpy
-import time
-import os
+import bpy,time,os
 
 class ImpExportAgr(bpy.types.Operator):
     """CSGO AGR Importer-Exporter"""      # blender will use this as a tooltip for menu items and buttons.
@@ -75,23 +73,23 @@ class ImpExportAgr(bpy.types.Operator):
         # Each Type of Model gets its own Array inside the Array
         PlayerAnimations = []
         for CurrentModel in bpy.data.objects:
-            # Find parents
-            if CurrentModel.name.find("afx.") != -1:
-                # Find Player Models
-                if CurrentModel.name.find("tm") != -1:
-                    # Test first and last Keyframe to get RunAnimation
-                    bpy.context.scene.frame_set(1.0)
-                    if CurrentModel.hide_render == False:    
-                        bpy.context.scene.frame_set(CurrentModel.animation_data.action.frame_range[1])
-                        if CurrentModel.hide_render == True:
-                            # Find RagdollAnimation
-                            for CurrentSecondModel in bpy.data.objects:
-                                if CurrentModel.name.find("afx.") != -1:
-                                    if CurrentSecondModel.name.find(CurrentModel.name.split()[1]) != -1:
-                                        # Dont use the same object-model
-                                        if CurrentSecondModel.name.find(CurrentModel.name.split()[0]) == -1:
-                                            PlayerAnimations.append([CurrentModel,CurrentSecondModel])  
-                                                          
+            # Find Player Models
+            if (CurrentModel.name.find("afx.") != -1 and CurrentModel.name.find("tm") != -1):
+                # Get RagdollAnimation and Changing Point 
+                CurrHideRender = CurrentModel.animation_data.action.fcurves[0]
+                if CurrHideRender.keyframe_points[1].co[0] > 1.0:
+                    ChangingKeyframe = int(CurrHideRender.keyframe_points[1].co[0])
+                    # Find RunAnimation
+                    for CurrentSecondModel in bpy.data.objects:
+                        if CurrentModel.name.find("afx.") != -1:
+                            if CurrentSecondModel.name.find(CurrentModel.name.split()[1]) != -1:
+                                # Dont use the same object-model
+                                if not CurrentModel == CurrentSecondModel:
+                                    SecHideRender = CurrentSecondModel.animation_data.action.fcurves[0]
+                                    if SecHideRender.keyframe_points[ChangingKeyframe].co[1] == 1.0:
+                                        if SecHideRender.keyframe_points[ChangingKeyframe-1].co[1] == 0.0: 
+                                            PlayerAnimations.append([CurrentSecondModel,CurrentModel])
+                                                                                         
         # Edit Animation-strips
         for i in range(len(PlayerAnimations)):
             RagdollStartFrame = PlayerAnimations[i][1].animation_data.action.fcurves[1].range()[0] 
@@ -114,10 +112,12 @@ class ImpExportAgr(bpy.types.Operator):
             PlayerAnimations[i][0].name = PlayerAnimations[i][0].name + "RunAndDeathAnim"
         print("Merging Run and DeathAimation finished")
     
+    
     # Open the filebrowser with the custom properties
     def invoke(self, context, event):
         context.window_manager.fileselect_add(self)
         return {'RUNNING_MODAL'}
+
     
     # Main funktion
     def execute(self, context):
@@ -194,7 +194,8 @@ class ImpExportAgr(bpy.types.Operator):
         print(" ")
         print ("FBX-Export script finished in %.4f sec." % (time.time() - time_start))
         return {'FINISHED'} 
-
+    
+    
 def register():
     bpy.utils.register_class(ImpExportAgr)
     bpy.types.INFO_MT_file_import.append(ImpExportAgr.menu_draw_import)

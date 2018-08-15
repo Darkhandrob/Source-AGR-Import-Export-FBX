@@ -1,11 +1,9 @@
 # CSGO Model Converter to FBX by Darkhand
 # https://www.youtube.com/user/Darkhandrob
 # https://twitter.com/Darkhandrob
-# Last change: 04.08.2018
+# Last change: 15.08.2018
 
-import bpy
-import time
-import os 
+import bpy,time,os
 
 class CSModelConverter(bpy.types.Operator):
     """CSGO default Model Converter"""      # blender will use this as a tooltip for menu items and buttons.
