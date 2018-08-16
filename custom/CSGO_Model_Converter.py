@@ -1,7 +1,7 @@
 # CSGO Model Converter to FBX by Darkhand
 # https://www.youtube.com/user/Darkhandrob
 # https://twitter.com/Darkhandrob
-# Last change: 15.08.2018
+# Last change: 16.08.2018
 
 import bpy,time,os
 
@@ -62,8 +62,6 @@ class CSModelConverter(bpy.types.Operator):
                     # Create Directory
                     self.ScannOrdner(SubFolder)
                 if FolderItem.endswith(".qc"):
-                    print("Subfolder:" + SubFolder)
-                    print("ModelPath:" + ModelPath)
                     self.ImportCSModels(SubFolder, ModelPath)
     
     def ImportCSModels(self, QCFile, ModelPath):
@@ -79,7 +77,7 @@ class CSModelConverter(bpy.types.Operator):
         
         # Create Directory
         NewModelPath = ModelPath.split(self.filepath)[1]
-        NewDirectoryPath = os.path.dirname(os.path.dirname(NewModelPath))
+        NewDirectoryPath = os.path.dirname(NewModelPath)
         CurrentExportingPath = os.path.join(self.exportingPath, NewDirectoryPath)
         os.makedirs(name=CurrentExportingPath, exist_ok=True)
         

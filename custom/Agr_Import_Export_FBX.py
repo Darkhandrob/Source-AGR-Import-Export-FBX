@@ -1,7 +1,7 @@
 # AGR-FBX Import and Export Script by Darkhand
 # https://www.youtube.com/user/Darkhandrob
 # https://twitter.com/Darkhandrob
-# Last change: 15.08.2018
+# Last change: 16.08.2018
 
 import bpy,time,os
 
@@ -23,7 +23,9 @@ class ImpExportAgr(bpy.types.Operator):
     # Layout for the Properties of the file Browser
     def draw(self, context):
         layout = self.layout
-        box_import = layout.box() 
+        box_import = layout.box()
+        box_import.prop(self, "frameRate")
+        box_import.prop(self, "framerateBase") 
         box_import.prop(self, "assetPath")
         box_import.prop(self, "interKey")
         box_import.prop(self, "global_scale")
@@ -34,6 +36,22 @@ class ImpExportAgr(bpy.types.Operator):
         box_export.prop(self, "exportingPath")
 
     # Custom properties 
+    frameRate = bpy.props.IntProperty(
+        name="FPS:",
+        description="Set the Framerate to which the agr was recorded.",
+        default=60,
+        soft_min=1,
+        soft_max=120,
+    )
+    framerateBase = bpy.props.FloatProperty(
+        name="/:",
+        description="Framerate base; Divisor of FPS:Base = Framerate",
+        default=1.0,
+        soft_min=0.1,
+        soft_max=120.0,
+        step=10,
+        precision=3,
+    )
     assetPath = bpy.props.StringProperty(
         name="Asset Path",
         description="Directory path containing the (decompiled) assets in a folder structure as in the pak01_dir.pak.",
@@ -42,7 +60,7 @@ class ImpExportAgr(bpy.types.Operator):
     interKey = bpy.props.BoolProperty(
         name="Add interpolated key frames",
         description="Create interpolated key frames for frames in-between the original key frames.",
-        default=False
+        default=False,
     )
     global_scale = bpy.props.FloatProperty(
         name="Scale",
@@ -59,7 +77,7 @@ class ImpExportAgr(bpy.types.Operator):
     skipRemDoubles = bpy.props.BoolProperty(
         name="Preserve SMD Polygons & Normals",
         description="Import raw (faster), disconnected polygons from SMD files; these are harder to edit but a closer match to the original mesh",
-        default=True
+        default=True,
     )
     exportingPath = bpy.props.StringProperty(
         name="Export Path",
@@ -71,58 +89,58 @@ class ImpExportAgr(bpy.types.Operator):
         # Ragdollanimation .hide_render is set as True at Frame 1
         # But if he was killed before starting recording, it is also the Ragdoll is False and Run is True
         # Each Type of Model gets its own Array inside the Array
-        PlayerAnimations = []
-        for CurrentModel in bpy.data.objects:
+        PlayerAnims = []
+        for CurrMdl in bpy.data.objects:
             # Find Player Models
-            if (CurrentModel.name.find("afx.") != -1 and CurrentModel.name.find("tm") != -1):
+            if (CurrMdl.name.find("afx.") != -1 and CurrMdl.name.find("tm") != -1):
                 # Get RagdollAnimation and Changing Point 
-                CurrHideRender = CurrentModel.animation_data.action.fcurves[0]
+                CurrHideRender = CurrMdl.animation_data.action.fcurves[0]
                 if CurrHideRender.keyframe_points[1].co[0] > 1.0:
-                    ChangingKeyframe = int(CurrHideRender.keyframe_points[1].co[0])
+                    ChgKeyframe = int(CurrHideRender.keyframe_points[1].co[0])
                     # Find RunAnimation
-                    for CurrentSecondModel in bpy.data.objects:
-                        if CurrentModel.name.find("afx.") != -1:
-                            if CurrentSecondModel.name.find(CurrentModel.name.split()[1]) != -1:
+                    for CurrSecMdl in bpy.data.objects:
+                        if CurrMdl.name.find("afx.") != -1:
+                            if CurrSecMdl.name.find(CurrMdl.name.split()[1]) != -1:
                                 # Dont use the same object-model
-                                if not CurrentModel == CurrentSecondModel:
-                                    SecHideRender = CurrentSecondModel.animation_data.action.fcurves[0]
-                                    if SecHideRender.keyframe_points[ChangingKeyframe].co[1] == 1.0:
-                                        if SecHideRender.keyframe_points[ChangingKeyframe-1].co[1] == 0.0: 
-                                            PlayerAnimations.append([CurrentSecondModel,CurrentModel])
+                                if not CurrMdl == CurrSecMdl:
+                                    SecHideRender = CurrSecMdl.animation_data.action.fcurves[0]
+                                    if SecHideRender.keyframe_points[ChgKeyframe].co[1] == 1.0:
+                                        if SecHideRender.keyframe_points[ChgKeyframe-1].co[1] == 0.0: 
+                                            PlayerAnims.append([CurrSecMdl,CurrMdl])
                                                                                          
         # Edit Animation-strips
-        for i in range(len(PlayerAnimations)):
-            RagdollStartFrame = PlayerAnimations[i][1].animation_data.action.fcurves[1].range()[0] 
-            PlayerAnimations[i][1].keyframe_delete(data_path="hide_render", frame=0.0)
-            RunDataAnim = PlayerAnimations[i][0].animation_data.action
-            RagdollDataAnim = PlayerAnimations[i][1].animation_data.action
+        for i in range(len(PlayerAnims)):
+            RagdollStart = PlayerAnims[i][1].animation_data.action.fcurves[1].range()[0] 
+            PlayerAnims[i][1].keyframe_delete(data_path="hide_render", frame=0.0)
+            RunDataAnim = PlayerAnims[i][0].animation_data.action
+            RagdollDataAnim = PlayerAnims[i][1].animation_data.action
             # Push Action down to new Strip
-            PlayerAnimations[i][0].animation_data_clear()
-            PlayerAnimations[i][0].animation_data_create()
-            PlayerAnimations[i][0].animation_data.nla_tracks.new()
-            PlayerAnimations[i][0].animation_data.nla_tracks[0].strips.new(name="RunData", start=0.0, action=RunDataAnim)
+            PlayerAnims[i][0].animation_data_clear()
+            PlayerAnims[i][0].animation_data_create()
+            ComplAnim = PlayerAnims[i][0].animation_data.nla_tracks.new()
+            ComplAnim.strips.new(name="RunData", start=0.0, action=RunDataAnim)
             # RunAnim already jumps on the frame, where the first keyframe of RagdollAnim is
-            PlayerAnimations[i][0].animation_data.nla_tracks[0].strips[RunDataAnim.name].action_frame_end = RagdollStartFrame - 1
-            PlayerAnimations[i][0].animation_data.nla_tracks[0].strips.new(name="RagdollDataAnim", start=RagdollStartFrame, action=RagdollDataAnim)
+            ComplAnim.strips[RunDataAnim.name].action_frame_end = RagdollStart - 1
+            ComplAnim.strips.new(name="RagdollDataAnim", start=RagdollStart, action=RagdollDataAnim)
             # Delete model
-            number_of_childrens = len(PlayerAnimations[i][1].children)
-            for y in range(number_of_childrens):
-                bpy.data.objects.remove(PlayerAnimations[i][1].children[0])
-            bpy.data.objects.remove(PlayerAnimations[i][1])
-            PlayerAnimations[i][0].name = PlayerAnimations[i][0].name + "RunAndDeathAnim"
+            for C in PlayerAnims[i][1].children:
+                bpy.data.objects.remove(C)
+            bpy.data.objects.remove(PlayerAnims[i][1])
+            PlayerAnims[i][0].name = PlayerAnims[i][0].name + "RunAndDeathAnim"
         print("Merging Run and DeathAimation finished")
-    
     
     # Open the filebrowser with the custom properties
     def invoke(self, context, event):
         context.window_manager.fileselect_add(self)
         return {'RUNNING_MODAL'}
-
     
     # Main funktion
     def execute(self, context):
         # Timing Runtime
         time_start = time.time()
+        # Change Framerate of Scene
+        bpy.context.scene.render.fps = self.frameRate
+        bpy.context.scene.render.fps_base = self.framerateBase
         # Import agr with input filepath
         bpy.ops.advancedfx.agr_importer(
             filepath=self.filepath,
@@ -133,35 +151,41 @@ class ImpExportAgr(bpy.types.Operator):
             skipRemDoubles=self.skipRemDoubles
         )
         # Create Directory
-        NewExportPath = os.path.join(self.exportingPath, bpy.path.display_name_from_filepath(self.filepath))
+        if not self.exportingPath:
+            NewExportPath = os.path.join(os.path.dirname(self.filepath), bpy.path.display_name_from_filepath(self.filepath))
+        else:
+            NewExportPath = os.path.join(self.exportingPath, bpy.path.display_name_from_filepath(self.filepath))
         os.makedirs(name=NewExportPath, exist_ok=True)
         self.exportingPath = NewExportPath
         
         # Execute method
         self.MergeInvAnims(context)
         # Delete physics(maybe include into merge_anim class for runtime)
-        for CurrentModel in bpy.data.objects: 
-            if CurrentModel.name.find("physics") != -1:
-                bpy.data.objects.remove(CurrentModel)
+        for CurrMdl in bpy.data.objects: 
+            if CurrMdl.name.find("physics") != -1:
+                bpy.data.objects.remove(CurrMdl)
                 
         print("Deleting Physics finished.")
-        for CurrentModel in bpy.data.objects:
-            if CurrentModel.name.find("afx.") != -1:
+        NumberMdl = 0
+        for CurrMdl in bpy.data.objects:
+            if CurrMdl.name.find("afx.") != -1:
                 #select all keyframes
-                if CurrentModel.name.find("RunAndDeathAnim") != -1:
-                    bpy.context.scene.frame_end = CurrentModel.animation_data.nla_tracks[0].strips[1].action_frame_end
+                if CurrMdl.name.find("RunAndDeathAnim") != -1:
+                    bpy.context.scene.frame_end = CurrMdl.animation_data.nla_tracks[0].strips[1].action_frame_end
                 else:
-                    bpy.context.scene.frame_end = CurrentModel.animation_data.action.frame_range[1]
+                    bpy.context.scene.frame_end = CurrMdl.animation_data.action.frame_range[1]
                 # select root
-                CurrentModel.select = True
+                CurrMdl.select = True
                 # select childrens
-                for CurrentChildren in CurrentModel.children:
+                for CurrentChildren in CurrMdl.children:
                     CurrentChildren.select = True
                 # rename top to root
-                CurrentObjectName = CurrentModel.name
-                CurrentModel.name = "root"
+                CurrObjName = CurrMdl.name
+                CurrMdl.name = "root"
                 # export single object as fbx
+                CurrentObjectName = CurrObjName.split()[1] + " " +  CurrObjName.split()[0]
                 fullfiles = self.exportingPath + "/" + CurrentObjectName + ".fbx"
+                NumberMdl += 1
                 bpy.ops.export_scene.fbx(
                     filepath = fullfiles, 
                     use_selection = True, 
@@ -171,12 +195,12 @@ class ImpExportAgr(bpy.types.Operator):
                     add_leaf_bones=False
                     )
                 # undo all changes
-                CurrentModel.name = CurrentObjectName
-                CurrentModel.select = False
-                for CurrentChildren in CurrentModel.children:
+                CurrMdl.name = CurrObjName
+                CurrMdl.select = False
+                for CurrentChildren in CurrMdl.children:
                     CurrentChildren.select = False
                 
-        print("Exporting Models finished.")    
+        print("Exporting "+ str(NumberMdl) +" Models finished.")    
         #export camera
         if bpy.data.objects.find("afxCam") != -1:
             bpy.data.objects["afxCam"].select = True

@@ -34,7 +34,7 @@ then you can use the "File"->"Export"->"AGR Export FBX", which will only delete 
 export every model with its childrens.
 
 Important Notice:
-If you get the error:"TypeError: Converting py args to operator properties: : keyword "interKey" unrecognized", you need to update your Blender Source Tools
+If you get the error:"TypeError: Converting py args to operator properties: : keyword "interKey" unrecognized", you need to update your afx-blender-scripts
 
 Changelog:
 
@@ -65,3 +65,9 @@ v1.2.1(04.08.2018)
 
 v1.2.2(15.08.2018)
 - fixed Bug in "all-in-one", if there are more than one players with the same model
+
+v1.2.3(16.08.2018)
+- Model Converter now exports only one folder above to counter Crowbar's folder for each model
+- added the option that the input filepath is used if no exporting path was given
+- added framerate-changer to importer of "all-in-one"
+- "all-in-one" now switches the exported filename, so the afx.X part is at the end for better usability
