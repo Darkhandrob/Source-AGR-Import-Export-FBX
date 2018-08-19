@@ -53,20 +53,27 @@ class CSModelConverter(bpy.types.Operator):
     def ScannOrdner(self, ModelPath):
         # Listing all Elements in the Directory
         FolderList = os.listdir(ModelPath)
+        QC_Exists = False
         # If Folderlist exists
         if FolderList:
+            # Check if a QC File Exists
+            for FolderItem in FolderList:
+                if FolderItem.endswith(".qc"):
+                    QC_Exists = True
             # Splitting Directories and Files
             for FolderItem in FolderList:
                 SubFolder = os.path.join(ModelPath, FolderItem)
                 if os.path.isdir(SubFolder):
                     # Create Directory
                     self.ScannOrdner(SubFolder)
-                if FolderItem.endswith(".qc"):
-                    self.ImportCSModels(SubFolder, ModelPath)
+                if QC_Exists and FolderItem.endswith(".qc"):
+                    self.ImportCSModels(SubFolder, ModelPath, False)
+                if not QC_Exists and FolderItem.endswith(".smd"):
+                    self.ImportCSModels(SubFolder, ModelPath, True)
     
-    def ImportCSModels(self, QCFile, ModelPath):
+    def ImportCSModels(self, QCFile, ModelPath, ImpAnim):
         # Import QC
-        bpy.ops.import_scene.smd(filepath=QCFile, doAnim=False) 
+        bpy.ops.import_scene.smd(filepath=QCFile, doAnim=ImpAnim) 
         for i in bpy.data.objects: 
             # Change name of parent to root
             if i.name.endswith("skeleton"):
