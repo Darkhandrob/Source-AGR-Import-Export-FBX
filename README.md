@@ -11,5 +11,5 @@ so you can open it in Unreal Engine 4.
 
 ## [Downloads are on the release page](https://github.com/Darkhandrob/CSGO-AGR-Import-Export-FBX/releases)
 
-### Instructions are in the [readme.txt](https://github.com/Darkhandrob/CSGO-AGR-Import-Export-FBX/blob/master/custom/readme.txt)
+### Instructions are in the [readme.txt](https://github.com/Darkhandrob/CSGO-AGR-Import-Export-FBX/blob/master/aiox/readme.txt)
 
