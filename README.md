@@ -1,14 +1,13 @@
 # CSGO-AGR-Import-Export-FBX (AIOX)
-Addon for Blender to export the recorded AGR-File from HLAE to FBX files for UE4
+This addon for Blender reduces the amount of work to import csgo's agr and export every model in it as a fbx,
+so you can open it in Unreal Engine 4.
 
 ## Features:
-- imports .agr through afx-blender-scripts
-- merging the Run-Animation and Ragdoll-Animation together in one model
-- selects all keyframes available
-- deletes Physics(everything with the name "physics" in it)
-- renames the parent-object(afx.*) to root and exports it with its childrens as FBX
-- exports afxCam as single FBX file
-- convert whole csgo model-folders to FBX for UE4
+- imports .agr(recorded animations with hlae)
+- fixes "record invisible"-option through merging run-animations and ragdoll-animations together
+- deletes useless physics for moviemaking
+- exports every animation as .fbx
+- converts decompiled models as fbx
 
 ## [Downloads are on the release page](https://github.com/Darkhandrob/CSGO-AGR-Import-Export-FBX/releases)
 
