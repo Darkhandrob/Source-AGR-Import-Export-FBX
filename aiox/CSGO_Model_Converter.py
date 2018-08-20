@@ -2,7 +2,7 @@
 # https://github.com/Darkhandrob
 # https://www.youtube.com/user/Darkhandrob
 # https://twitter.com/Darkhandrob
-# Last change: 19.08.2018
+# Last change: 20.08.2018
 
 import bpy,time,os
 
@@ -26,6 +26,7 @@ class CSModelConverter(bpy.types.Operator):
         box_export.prop(self, "convMdl")
         box_export.prop(self, "convAnim")
         box_export.prop(self, "exportingPath")
+        box_export.prop(self, "invSubfld")
     
     # Custom properties 
     exportingPath = bpy.props.StringProperty(
@@ -41,6 +42,11 @@ class CSModelConverter(bpy.types.Operator):
     convAnim = bpy.props.BoolProperty(
         name="Convert animations",
         description="Convert the .smd animations",
+        default=False,
+    )
+    invSubfld = bpy.props.BoolProperty(
+        name="Invert folder for each model",
+        description="Moves all files one folder up in the hierarchy; not recommended if animations should be converted too",
         default=False,
     )
         
@@ -98,8 +104,11 @@ class CSModelConverter(bpy.types.Operator):
         
         # Create Directory
         NewModelPath = ModelPath.split(self.filepath)[1]
-        NewDirectoryPath = os.path.dirname(NewModelPath)
-        CurrentExportingPath = os.path.join(self.exportingPath, NewDirectoryPath)
+        if self.invSubfld:
+            NewDirectoryPath = os.path.dirname(NewModelPath)
+            CurrentExportingPath = os.path.join(self.exportingPath, NewDirectoryPath)
+        else:
+            CurrentExportingPath = os.path.join(self.exportingPath, NewModelPath)
         os.makedirs(name=CurrentExportingPath, exist_ok=True)
         
         # Export as fbx

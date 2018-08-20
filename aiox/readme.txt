@@ -79,3 +79,6 @@ v1.2.3(16.08.2018)
 v1.3.0(19.08.2018)
 - moved the script folder from "custom" to "aiox"
 - added importing .smd animations-option to "CSGO Model Converter"
+
+v1.3.1(20.08.2018)
+- made "inverting folder for each model from crowbar" optional from "CSGO Model Converter"
