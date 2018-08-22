@@ -2,7 +2,7 @@
 # https://github.com/Darkhandrob
 # https://www.youtube.com/user/Darkhandrob
 # https://twitter.com/Darkhandrob
-# Last change: 20.08.2018
+# Last change: 23.08.2018
 
 import bpy,time,os
 
@@ -49,7 +49,7 @@ class CSModelConverter(bpy.types.Operator):
         description="Moves all files one folder up in the hierarchy; not recommended if animations should be converted too",
         default=False,
     )
-        
+    
     # Open the filebrowser with the custom properties
     def invoke(self, context, event):
         context.window_manager.fileselect_add(self)
@@ -69,6 +69,29 @@ class CSModelConverter(bpy.types.Operator):
         print(" ")
         print ("CSGO Model Converter finished in %.4f sec." % (time.time() - time_start))
         return {'FINISHED'} 
+    
+    def FixArms(self, MdlName):
+        bpy.ops.object.mode_set(mode='OBJECT')
+        bpy.data.armatures[0].bones['v_weapon.Bip01_L_Forearm'].select = True
+        bpy.data.armatures[0].bones['v_weapon.Bip01_R_Forearm'].select = True
+        # ctm_heavy arms dont have ForeTwists bones
+        if not MdlName.endswith("_heavy"):
+            bpy.data.armatures[0].bones['v_weapon.Bip01_L_ForeTwist'].select = True
+            bpy.data.armatures[0].bones['v_weapon.Bip01_R_ForeTwist'].select = True
+        bpy.ops.object.mode_set(mode='EDIT')
+        bpy.ops.armature.parent_clear()
+        bpy.ops.object.mode_set(mode='OBJECT')
+        bpy.data.armatures[0].bones['v_weapon.Bip01_L_Forearm'].select = False
+        bpy.data.armatures[0].bones['v_weapon.Bip01_R_Forearm'].select = False
+        if not MdlName.endswith("_heavy"):
+            bpy.data.armatures[0].bones['v_weapon.Bip01_L_ForeTwist'].select = False
+            bpy.data.armatures[0].bones['v_weapon.Bip01_R_ForeTwist'].select = False
+        bpy.data.armatures[0].bones['v_weapon'].select = True
+        for bones in bpy.data.armatures[0].bones['v_weapon'].children_recursive:
+            bones.select = True
+        bpy.ops.object.mode_set(mode='EDIT')
+        bpy.ops.armature.delete()
+        bpy.ops.object.mode_set(mode='OBJECT')
 
     def ScannOrdner(self, ModelPath):
         # Listing all Elements in the Directory
@@ -111,21 +134,56 @@ class CSModelConverter(bpy.types.Operator):
             CurrentExportingPath = os.path.join(self.exportingPath, NewModelPath)
         os.makedirs(name=CurrentExportingPath, exist_ok=True)
         
-        # Export as fbx
-        bpy.ops.export_scene.fbx(
-            filepath = os.path.join(
-                CurrentExportingPath,
-                bpy.path.display_name_from_filepath(QCFile) + ".fbx"),
-            use_selection=False, 
-            bake_anim_use_nla_strips = False, 
-            bake_anim_use_all_actions = False, 
-            bake_anim_simplify_factor = 0,
-            add_leaf_bones=False)
+        MdlName = bpy.path.display_name_from_filepath(QCFile)
         
+        if MdlName.startswith("v_glove") or MdlName.startswith("v_sleeve"):
+            if self.convAnim: 
+                self.FixArms(MdlName)
+                # Export as fbx with agr
+                bpy.ops.export_scene.fbx(
+                    filepath = os.path.join(
+                        CurrentExportingPath,
+                        MdlName + ".fbx"),
+                    use_selection=False, 
+                    bake_anim_use_nla_strips = False, 
+                    bake_anim_use_all_actions = False,
+                    bake_anim_simplify_factor = 0,
+                    add_leaf_bones=False)
+            if self.convMdl:
+                # Export as fbx
+                bpy.ops.export_scene.fbx(
+                    filepath = os.path.join(
+                        CurrentExportingPath,
+                        "agr_" + MdlName + ".fbx"),
+                    use_selection=False, 
+                    bake_anim_use_nla_strips = False, 
+                    bake_anim_use_all_actions = False,
+                    bake_anim_simplify_factor = 0,
+                    add_leaf_bones=False)
+        else:
+            # Export as fbx
+            bpy.ops.export_scene.fbx(
+                filepath = os.path.join(
+                    CurrentExportingPath,
+                    MdlName + ".fbx"),
+                use_selection=False, 
+                bake_anim_use_nla_strips = False, 
+                bake_anim_use_all_actions = False, 
+                bake_anim_simplify_factor = 0,
+                add_leaf_bones=False)
+
         # Cleanup
         for MdlObjects in bpy.data.objects:
             bpy.data.objects.remove(MdlObjects)
-            
+        for MdlActions in bpy.data.actions:
+            bpy.data.actions.remove(MdlActions)
+        for MdlArmatures in bpy.data.armatures:
+            bpy.data.armatures.remove(MdlArmatures)
+        for MdlMeshes in bpy.data.meshes:
+            bpy.data.meshes.remove(MdlMeshes)
+        for MdlMaterials in bpy.data.materials:
+            bpy.data.materials.remove(MdlMaterials)    
+        
         
 def register():
     bpy.utils.register_class(CSModelConverter)

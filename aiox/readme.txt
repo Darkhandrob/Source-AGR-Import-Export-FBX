@@ -82,3 +82,7 @@ v1.3.0(19.08.2018)
 
 v1.3.1(20.08.2018)
 - made "inverting folder for each model from crowbar" optional from "CSGO Model Converter"
+
+v1.3.2(23.08.2018)
+- added behaviour of v_glove and v_sleeve models for the default v_weapon animations in "CSGO Model Converter"
+- fixed memory leak in "CSGO Model Converter"
