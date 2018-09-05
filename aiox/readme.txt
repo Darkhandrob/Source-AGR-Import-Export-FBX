@@ -86,3 +86,6 @@ v1.3.1(20.08.2018)
 v1.3.2(23.08.2018)
 - added behaviour of v_glove and v_sleeve models for the default v_weapon animations in "CSGO Model Converter"
 - fixed memory leak in "CSGO Model Converter"
+
+v1.3.3(05.09.2018)
+- fixed logical error in "only Export"

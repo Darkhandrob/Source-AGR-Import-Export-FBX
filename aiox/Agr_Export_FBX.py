@@ -2,7 +2,7 @@
 # https://github.com/Darkhandrob
 # https://www.youtube.com/user/Darkhandrob
 # https://twitter.com/Darkhandrob
-# Last change: 19.08.2018
+# Last change: 05.09.2018
 
 import bpy,time
 
@@ -43,7 +43,7 @@ class ExportAgr(bpy.types.Operator):
                 CurrentModel.select = True
                 # select childrens
                 for CurrentChildren in CurrentModel.children:
-                    CurrentModel.CurrentChildren.select = True
+                    CurrentChildren.select = True
                 # rename top to root
                 CurrentObjectName = CurrentModel.name
                 CurrentModel.name = "root"
@@ -60,7 +60,7 @@ class ExportAgr(bpy.types.Operator):
                 CurrentModel.name = CurrentObjectName
                 CurrentModel.select = False
                 for CurrentChildren in CurrentModel.children:
-                    CurrentModel.CurrentChildren.select = False
+                    CurrentChildren.select = False
 
             # export camera
         if bpy.data.objects.find("afxCam") != -1:
