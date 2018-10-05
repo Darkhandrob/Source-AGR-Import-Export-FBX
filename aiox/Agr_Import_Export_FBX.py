@@ -2,7 +2,7 @@
 # https://github.com/Darkhandrob
 # https://www.youtube.com/user/Darkhandrob
 # https://twitter.com/Darkhandrob
-# Last change: 19.08.2018
+# Last change: 05.10.2018
 
 import bpy,time,os
 
@@ -32,6 +32,7 @@ class ImpExportAgr(bpy.types.Operator):
         box_import.prop(self, "global_scale")
         box_import.prop(self, "scaleInvisibleZero")
         box_import.prop(self, "skipRemDoubles")
+        box_import.prop(self, "onlyBones")
         
         box_export = layout.box()
         box_export.prop(self, "exportingPath")
@@ -79,6 +80,11 @@ class ImpExportAgr(bpy.types.Operator):
         name="Preserve SMD Polygons & Normals",
         description="Import raw (faster), disconnected polygons from SMD files; these are harder to edit but a closer match to the original mesh",
         default=True,
+    )
+    onlyBones = bpy.props.BoolProperty(
+        name="Bones (skeleton) only",
+        description="Import only bones (skeleton) (faster).",
+        default=True
     )
     exportingPath = bpy.props.StringProperty(
         name="Export Path",
@@ -157,7 +163,8 @@ class ImpExportAgr(bpy.types.Operator):
             interKey =self.interKey,
             global_scale = self.global_scale,
             scaleInvisibleZero=self.scaleInvisibleZero,
-            skipRemDoubles=self.skipRemDoubles
+            skipRemDoubles=self.skipRemDoubles,
+            onlyBones=self.onlyBones
         )
         # Create Directory
         if not self.exportingPath:

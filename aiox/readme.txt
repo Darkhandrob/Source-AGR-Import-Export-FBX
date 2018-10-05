@@ -89,3 +89,6 @@ v1.3.2(23.08.2018)
 
 v1.3.3(05.09.2018)
 - fixed logical error in "only Export"
+
+v1.4.0(05.10.2018)
+- added option "onlyBones" from afx-blender-scripts v1.6.0
