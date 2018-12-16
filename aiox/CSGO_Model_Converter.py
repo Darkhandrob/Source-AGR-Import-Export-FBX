@@ -2,7 +2,7 @@
 # https://github.com/Darkhandrob
 # https://www.youtube.com/user/Darkhandrob
 # https://twitter.com/Darkhandrob
-# Last change: 23.08.2018
+# Last change: 02.12.2018 (by Devostated)
 
 import bpy,time,os
 
@@ -25,6 +25,7 @@ class CSModelConverter(bpy.types.Operator):
         box_export = layout.box()
         box_export.prop(self, "convMdl")
         box_export.prop(self, "convAnim")
+        box_export.prop(self, "chngScale")
         box_export.prop(self, "exportingPath")
         box_export.prop(self, "invSubfld")
     
@@ -36,20 +37,27 @@ class CSModelConverter(bpy.types.Operator):
     )
     convMdl = bpy.props.BoolProperty(
         name="Convert models",
-        description="Convert the .qc model files",
+        description="Convert the .qc model files (e.g. for AGR)",
         default=True,
     )
     convAnim = bpy.props.BoolProperty(
         name="Convert animations",
-        description="Convert the .smd animations",
+        description="Convert the .smd animations (e.g. UE4 custom PoV)",
         default=False,
+    )
+    chngScale = bpy.props.FloatProperty(
+        name="Scale",
+        description="Scales models and animations",
+        min=0.000001, max=100000.0,
+        soft_min=0.001, soft_max=1.0,
+        default=0.01,
     )
     invSubfld = bpy.props.BoolProperty(
         name="Invert folder for each model",
         description="Moves all files one folder up in the hierarchy; not recommended if animations should be converted too",
         default=False,
     )
-    
+        
     # Open the filebrowser with the custom properties
     def invoke(self, context, event):
         context.window_manager.fileselect_add(self)
@@ -63,7 +71,7 @@ class CSModelConverter(bpy.types.Operator):
         if not self.filepath.endswith("\\"):
             self.filepath = self.filepath.rsplit(sep="\\", maxsplit=1)[0] + "\\"   
         # Rekursiv Function to search through all folders     
-        self.ScannOrdner(self.filepath)  
+        self.ScannOrdner(self.filepath)
         # End
         print("Converting Models finished.")
         print(" ")
@@ -92,7 +100,7 @@ class CSModelConverter(bpy.types.Operator):
         bpy.ops.object.mode_set(mode='EDIT')
         bpy.ops.armature.delete()
         bpy.ops.object.mode_set(mode='OBJECT')
-
+        
     def ScannOrdner(self, ModelPath):
         # Listing all Elements in the Directory
         FolderList = os.listdir(ModelPath)
@@ -116,15 +124,15 @@ class CSModelConverter(bpy.types.Operator):
     
     def ImportCSModels(self, QCFile, ModelPath, ImpAnim):
         # Import QC
-        bpy.ops.import_scene.smd(filepath=QCFile, doAnim=ImpAnim) 
+        bpy.ops.import_scene.smd(filepath=QCFile, doAnim=ImpAnim)     
         for i in bpy.data.objects: 
             # Change name of parent to root
             if i.name.endswith("skeleton"):
                 i.name = "root"
             # Delete Physics
             if i.name.find("physics") != -1:
-                bpy.data.objects.remove(i)
         
+                bpy.data.objects.remove(i)
         # Create Directory
         NewModelPath = ModelPath.split(self.filepath)[1]
         if self.invSubfld:
@@ -136,7 +144,19 @@ class CSModelConverter(bpy.types.Operator):
         
         MdlName = bpy.path.display_name_from_filepath(QCFile)
         
-        if MdlName.startswith("v_glove") or MdlName.startswith("v_sleeve"):
+        if MdlName.startswith("v_glove") or MdlName.startswith("v_sleeve") or MdlName.startswith("v_bare"):    
+            if self.convMdl:
+                # Export as fbx
+                bpy.ops.export_scene.fbx(
+                    filepath = os.path.join(
+                        CurrentExportingPath,
+                        "agr_" + MdlName + ".fbx"),
+                    use_selection=False, 
+                    bake_anim_use_nla_strips = False, 
+                    bake_anim_use_all_actions = False,
+                    bake_anim_simplify_factor = 0,
+                    add_leaf_bones=False,
+                    global_scale=self.chngScale)
             if self.convAnim: 
                 self.FixArms(MdlName)
                 # Export as fbx with agr
@@ -148,18 +168,8 @@ class CSModelConverter(bpy.types.Operator):
                     bake_anim_use_nla_strips = False, 
                     bake_anim_use_all_actions = False,
                     bake_anim_simplify_factor = 0,
-                    add_leaf_bones=False)
-            if self.convMdl:
-                # Export as fbx
-                bpy.ops.export_scene.fbx(
-                    filepath = os.path.join(
-                        CurrentExportingPath,
-                        "agr_" + MdlName + ".fbx"),
-                    use_selection=False, 
-                    bake_anim_use_nla_strips = False, 
-                    bake_anim_use_all_actions = False,
-                    bake_anim_simplify_factor = 0,
-                    add_leaf_bones=False)
+                    add_leaf_bones=False,
+                    global_scale=self.chngScale)
         else:
             # Export as fbx
             bpy.ops.export_scene.fbx(
@@ -170,7 +180,8 @@ class CSModelConverter(bpy.types.Operator):
                 bake_anim_use_nla_strips = False, 
                 bake_anim_use_all_actions = False, 
                 bake_anim_simplify_factor = 0,
-                add_leaf_bones=False)
+                add_leaf_bones=False,
+                global_scale=self.chngScale)
 
         # Cleanup
         for MdlObjects in bpy.data.objects:
@@ -192,7 +203,7 @@ def register():
 def unregister():
     bpy.types.INFO_MT_file_import.remove(CSModelConverter.menu_draw_convert)
     bpy.utils.unregister_class(CSModelConverter)
-    
+     
 # This allows you to run the script directly from blenders text editor
 # to test the addon without having to install it.
 if __name__ == "__main__":
