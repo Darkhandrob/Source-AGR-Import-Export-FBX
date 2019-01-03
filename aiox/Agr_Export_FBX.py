@@ -2,7 +2,7 @@
 # https://github.com/Darkhandrob
 # https://www.youtube.com/user/Darkhandrob
 # https://twitter.com/Darkhandrob
-# Last change: 05.09.2018
+# Last change: 24.12.2018
 
 import bpy,time
 
@@ -33,7 +33,7 @@ class ExportAgr(bpy.types.Operator):
         # Delete physics
         for i in bpy.data.objects: 
             if i.name.find("physics") != -1:
-                bpy.data.objects.remove()
+                bpy.data.objects.remove(i)
                 
         print("Deleting Physics finished.")
         # select and rename hierarchy objects to root
