@@ -93,5 +93,8 @@ v1.3.3(05.09.2018)
 v1.4.0(05.10.2018)
 - added option "onlyBones" from afx-blender-scripts v1.6.0
 
-v1.5.0(03.02.2018)
+v1.5.0(03.02.2019)
 - updated for Blender v2.80
+
+v1.5.1(15.03.2019)
+- added option in Model Converter to convert Apex Legends files
