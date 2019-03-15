@@ -2,7 +2,7 @@
 # https://github.com/Darkhandrob
 # https://www.youtube.com/user/Darkhandrob
 # https://twitter.com/Darkhandrob
-# Last change: 02.02.2019
+# Last change: 15.03.2019
 
 import bpy,time,os
 
@@ -19,7 +19,7 @@ class CSModelConverter(bpy.types.Operator):
         layout = self.layout
         layout.operator("aiox.csgo_model_converter", text="CSGO Model Converter")
     
-    # Layout for the Properties of the file Browser
+    # Layout for the properties of the file browser
     def draw(self, context):
         layout = self.layout
         box_export = layout.box()
@@ -28,6 +28,7 @@ class CSModelConverter(bpy.types.Operator):
         box_export.prop(self, "chngScale")
         box_export.prop(self, "exportingPath")
         box_export.prop(self, "invSubfld")
+        box_export.prop(self, "convApexLegFiles")
     
     # Custom properties 
     exportingPath: bpy.props.StringProperty(
@@ -57,6 +58,11 @@ class CSModelConverter(bpy.types.Operator):
         description="Moves all files one folder up in the hierarchy; not recommended if animations should be converted too",
         default=False,
     )
+    convApexLegFiles: bpy.props.BoolProperty(
+        name="Convert Apex Legends Files",
+        description="Converts only folder which starts with pilot_, pov_, ptpov_ und w_",
+        default=False,
+    )
         
     # Open the filebrowser with the custom properties
     def invoke(self, context, event):
@@ -70,8 +76,12 @@ class CSModelConverter(bpy.types.Operator):
         # Change Filepath, if something is inputted in the File Name Box
         if not self.filepath.endswith("\\"):
             self.filepath = self.filepath.rsplit(sep="\\", maxsplit=1)[0] + "\\"   
-        # Rekursiv Function to search through all folders     
-        self.ScannOrdner(self.filepath)
+        # Recursiv function to search through all folders
+        if self.convApexLegFiles:
+            self.ApexScanFolder(self.filepath)
+        else:
+            self.ScanFolder(self.filepath)     
+        
         # End
         print("Converting Models finished.")
         print(" ")
@@ -101,7 +111,7 @@ class CSModelConverter(bpy.types.Operator):
         bpy.ops.armature.delete()
         bpy.ops.object.mode_set(mode='OBJECT')
         
-    def ScannOrdner(self, ModelPath):
+    def ScanFolder(self, ModelPath):
         # Listing all Elements in the Directory
         FolderList = os.listdir(ModelPath)
         QC_Exists = False
@@ -115,8 +125,30 @@ class CSModelConverter(bpy.types.Operator):
             for FolderItem in FolderList:
                 SubFolder = os.path.join(ModelPath, FolderItem)
                 if os.path.isdir(SubFolder):
-                    # Create Directory
-                    self.ScannOrdner(SubFolder)
+                    # Scan Sub-Folder
+                    self.ScanFolder(SubFolder)
+                if QC_Exists and self.convMdl and FolderItem.endswith(".qc"):
+                    self.ImportCSModels(SubFolder, ModelPath, False)
+                if not QC_Exists and self.convAnim and FolderItem.endswith(".smd"):
+                    self.ImportCSModels(SubFolder, ModelPath, True)
+                    
+    def ApexScanFolder(self, ModelPath):
+        # Listing all Elements in the Directory
+        FolderList = os.listdir(ModelPath)
+        QC_Exists = False
+        # If Folderlist exists
+        if FolderList:
+            # Check if a QC File Exists
+            for FolderItem in FolderList:
+                if FolderItem.endswith(".qc"):
+                    QC_Exists = True
+            # Splitting Directories and Files
+            for FolderItem in FolderList:
+                SubFolder = os.path.join(ModelPath, FolderItem)
+                if os.path.isdir(SubFolder) and (FolderItem.startswith("pilot_") or FolderItem.startswith("pov_") 
+                or FolderItem.startswith("ptpov_") or FolderItem.startswith("w_") ):
+                    # Scan Sub-Folder
+                    self.ApexScanFolder(SubFolder)
                 if QC_Exists and self.convMdl and FolderItem.endswith(".qc"):
                     self.ImportCSModels(SubFolder, ModelPath, False)
                 if not QC_Exists and self.convAnim and FolderItem.endswith(".smd"):
