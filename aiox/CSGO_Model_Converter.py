@@ -2,7 +2,7 @@
 # https://github.com/Darkhandrob
 # https://www.youtube.com/user/Darkhandrob
 # https://twitter.com/Darkhandrob
-# Last change: 02.12.2018 (by Devostated)
+# Last change: 02.02.2019
 
 import bpy,time,os
 
@@ -13,7 +13,7 @@ class CSModelConverter(bpy.types.Operator):
     bl_options = {'REGISTER', 'UNDO'}  # enable undo for the operator.
     
     # Properties used by the file browser
-    filepath = bpy.props.StringProperty(subtype="DIR_PATH")
+    filepath: bpy.props.StringProperty(subtype="DIR_PATH")
     
     def menu_draw_convert(self, context):
         layout = self.layout
@@ -30,29 +30,29 @@ class CSModelConverter(bpy.types.Operator):
         box_export.prop(self, "invSubfld")
     
     # Custom properties 
-    exportingPath = bpy.props.StringProperty(
+    exportingPath: bpy.props.StringProperty(
         name="Export Path", 
         description="Directory path to export FBX files",
         default="",
     )
-    convMdl = bpy.props.BoolProperty(
+    convMdl: bpy.props.BoolProperty(
         name="Convert models",
         description="Convert the .qc model files (e.g. for AGR)",
         default=True,
     )
-    convAnim = bpy.props.BoolProperty(
+    convAnim: bpy.props.BoolProperty(
         name="Convert animations",
         description="Convert the .smd animations (e.g. UE4 custom PoV)",
         default=False,
     )
-    chngScale = bpy.props.FloatProperty(
+    chngScale: bpy.props.FloatProperty(
         name="Scale",
         description="Scales models and animations",
         min=0.000001, max=100000.0,
         soft_min=0.001, soft_max=1.0,
         default=0.01,
     )
-    invSubfld = bpy.props.BoolProperty(
+    invSubfld: bpy.props.BoolProperty(
         name="Invert folder for each model",
         description="Moves all files one folder up in the hierarchy; not recommended if animations should be converted too",
         default=False,
@@ -80,23 +80,23 @@ class CSModelConverter(bpy.types.Operator):
     
     def FixArms(self, MdlName):
         bpy.ops.object.mode_set(mode='OBJECT')
-        bpy.data.armatures[0].bones['v_weapon.Bip01_L_Forearm'].select = True
-        bpy.data.armatures[0].bones['v_weapon.Bip01_R_Forearm'].select = True
+        bpy.data.armatures[0].bones['v_weapon.Bip01_L_Forearm'].select_set(1)
+        bpy.data.armatures[0].bones['v_weapon.Bip01_R_Forearm'].select_set(1)
         # ctm_heavy arms dont have ForeTwists bones
         if not MdlName.endswith("_heavy"):
-            bpy.data.armatures[0].bones['v_weapon.Bip01_L_ForeTwist'].select = True
-            bpy.data.armatures[0].bones['v_weapon.Bip01_R_ForeTwist'].select = True
+            bpy.data.armatures[0].bones['v_weapon.Bip01_L_ForeTwist'].select_set(1)
+            bpy.data.armatures[0].bones['v_weapon.Bip01_R_ForeTwist'].select_set(1)
         bpy.ops.object.mode_set(mode='EDIT')
         bpy.ops.armature.parent_clear()
         bpy.ops.object.mode_set(mode='OBJECT')
-        bpy.data.armatures[0].bones['v_weapon.Bip01_L_Forearm'].select = False
-        bpy.data.armatures[0].bones['v_weapon.Bip01_R_Forearm'].select = False
+        bpy.data.armatures[0].bones['v_weapon.Bip01_L_Forearm'].select_set(0)
+        bpy.data.armatures[0].bones['v_weapon.Bip01_R_Forearm'].select_set(0)
         if not MdlName.endswith("_heavy"):
-            bpy.data.armatures[0].bones['v_weapon.Bip01_L_ForeTwist'].select = False
-            bpy.data.armatures[0].bones['v_weapon.Bip01_R_ForeTwist'].select = False
-        bpy.data.armatures[0].bones['v_weapon'].select = True
+            bpy.data.armatures[0].bones['v_weapon.Bip01_L_ForeTwist'].select_set(0)
+            bpy.data.armatures[0].bones['v_weapon.Bip01_R_ForeTwist'].select_set(0)
+        bpy.data.armatures[0].bones['v_weapon'].select_set(1)
         for bones in bpy.data.armatures[0].bones['v_weapon'].children_recursive:
-            bones.select = True
+            bones.select_set(1)
         bpy.ops.object.mode_set(mode='EDIT')
         bpy.ops.armature.delete()
         bpy.ops.object.mode_set(mode='OBJECT')
@@ -196,15 +196,15 @@ class CSModelConverter(bpy.types.Operator):
             bpy.data.materials.remove(MdlMaterials)    
         
         
-def register():
-    bpy.utils.register_class(CSModelConverter)
-    bpy.types.INFO_MT_file_import.append(CSModelConverter.menu_draw_convert)
-    
-def unregister():
-    bpy.types.INFO_MT_file_import.remove(CSModelConverter.menu_draw_convert)
-    bpy.utils.unregister_class(CSModelConverter)
-     
-# This allows you to run the script directly from blenders text editor
-# to test the addon without having to install it.
-if __name__ == "__main__":
-    register()
+#def register():
+#    bpy.utils.register_class(CSModelConverter)
+#    bpy.types.TOPBAR_MT_file_import.append(CSModelConverter.menu_draw_convert)
+#    
+#def unregister():
+#    bpy.types.TOPBAR_MT_file_import.remove(CSModelConverter.menu_draw_convert)
+#    bpy.utils.unregister_class(CSModelConverter)
+#     
+## This allows you to run the script directly from blenders text editor
+## to test the addon without having to install it.
+#if __name__ == "__main__":
+#    register()

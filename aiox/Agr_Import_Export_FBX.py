@@ -2,7 +2,7 @@
 # https://github.com/Darkhandrob
 # https://www.youtube.com/user/Darkhandrob
 # https://twitter.com/Darkhandrob
-# Last change: 05.10.2018
+# Last change: 02.02.2019
 
 import bpy,time,os
 
@@ -13,9 +13,9 @@ class ImpExportAgr(bpy.types.Operator):
     bl_options = {'REGISTER', 'UNDO'}  # enable undo for the operator.
     
     # Properties used by the file browser
-    filepath = bpy.props.StringProperty(subtype="FILE_PATH")
+    filepath: bpy.props.StringProperty(subtype="FILE_PATH")
     filename_ext = ".agr"
-    filter_glob = bpy.props.StringProperty(default="*.agr", options={'HIDDEN'})
+    filter_glob: bpy.props.StringProperty(default="*.agr", options={'HIDDEN'})
     
     def menu_draw_import(self, context):
         layout = self.layout
@@ -38,14 +38,14 @@ class ImpExportAgr(bpy.types.Operator):
         box_export.prop(self, "exportingPath")
 
     # Custom properties 
-    frameRate = bpy.props.IntProperty(
+    frameRate: bpy.props.IntProperty(
         name="FPS:",
         description="Framerate of the Scene, which should match the fps of the recorded agr",
         default=60,
         soft_min=1,
         soft_max=120,
     )
-    framerateBase = bpy.props.FloatProperty(
+    framerateBase:  bpy.props.FloatProperty(
         name="/:",
         description="Framerate base; Divisor of FPS:Base = Framerate",
         default=1.0,
@@ -54,39 +54,39 @@ class ImpExportAgr(bpy.types.Operator):
         step=10,
         precision=3,
     )
-    assetPath = bpy.props.StringProperty(
+    assetPath: bpy.props.StringProperty(
         name="Asset Path",
         description="Directory path containing the (decompiled) assets in a folder structure as in the pak01_dir.pak.",
         default="",
     )
-    interKey = bpy.props.BoolProperty(
+    interKey: bpy.props.BoolProperty(
         name="Add interpolated key frames",
         description="Create interpolated key frames for frames in-between the original key frames.",
         default=False,
     )
-    global_scale = bpy.props.FloatProperty(
+    global_scale: bpy.props.FloatProperty(
         name="Scale",
         description="Scale everything by this value",
         min=0.000001, max=1000000.0,
         soft_min=0.001, soft_max=1.0,
         default=0.01,
     )    
-    scaleInvisibleZero = bpy.props.BoolProperty(
+    scaleInvisibleZero: bpy.props.BoolProperty(
         name="Scale invisible to zero",
         description="If set entities will scaled to zero when not visible.",
         default=False,
     )
-    skipRemDoubles = bpy.props.BoolProperty(
+    skipRemDoubles: bpy.props.BoolProperty(
         name="Preserve SMD Polygons & Normals",
         description="Import raw (faster), disconnected polygons from SMD files; these are harder to edit but a closer match to the original mesh",
         default=True,
     )
-    onlyBones = bpy.props.BoolProperty(
+    onlyBones: bpy.props.BoolProperty(
         name="Bones (skeleton) only",
         description="Import only bones (skeleton) (faster).",
         default=True
     )
-    exportingPath = bpy.props.StringProperty(
+    exportingPath: bpy.props.StringProperty(
         name="Export Path",
         description="Directory path to export FBX files",
         default="",
@@ -157,7 +157,7 @@ class ImpExportAgr(bpy.types.Operator):
         bpy.context.scene.render.fps = self.frameRate
         bpy.context.scene.render.fps_base = self.framerateBase
         # Import agr with input filepath
-        bpy.ops.advancedfx.agr_importer(
+        bpy.ops.advancedfx.agrimporter(
             filepath=self.filepath,
             assetPath=self.assetPath,
             interKey =self.interKey,
@@ -191,10 +191,10 @@ class ImpExportAgr(bpy.types.Operator):
                 else:
                     bpy.context.scene.frame_end = CurrMdl.animation_data.action.frame_range[1]
                 # select root
-                CurrMdl.select = True
+                CurrMdl.select_set(1)
                 # select childrens
                 for CurrChild in CurrMdl.children:
-                    CurrChild.select = True
+                    CurrChild.select_set(1)
                 # rename top to root
                 CurrObjName = CurrMdl.name
                 CurrMdl.name = "root"
@@ -212,15 +212,15 @@ class ImpExportAgr(bpy.types.Operator):
                     )
                 # undo all changes
                 CurrMdl.name = CurrObjName
-                CurrMdl.select = False
+                CurrMdl.select_set(0)
                 for CurrChild in CurrMdl.children:
-                    CurrChild.select = False
+                    CurrChild.select_set(0)
                 
         print("Exporting "+ str(NumberMdl) +" Models finished.")
             
         #export camera
         if bpy.data.objects.find("afxCam") != -1:
-            bpy.data.objects["afxCam"].select = True
+            bpy.data.objects["afxCam"].select_set(1)
             fullfiles_cam = self.exportingPath + "/afxcam.fbx"
             bpy.ops.export_scene.fbx(
                 filepath = fullfiles_cam, 
@@ -229,7 +229,7 @@ class ImpExportAgr(bpy.types.Operator):
                 bake_anim_use_all_actions = False, 
                 bake_anim_simplify_factor = 0,
                 add_leaf_bones=False)
-            bpy.data.objects["afxCam"].select = False
+            bpy.data.objects["afxCam"].select_set(0)
             
         print("Exporting Camera Finished.")
         print(" ")
@@ -237,15 +237,15 @@ class ImpExportAgr(bpy.types.Operator):
         return {'FINISHED'} 
     
     
-def register():
-    bpy.utils.register_class(ImpExportAgr)
-    bpy.types.INFO_MT_file_import.append(ImpExportAgr.menu_draw_import)
-    
-def unregister():
-    bpy.types.INFO_MT_file_import.remove(ImpExportAgr.menu_draw_import)
-    bpy.utils.unregister_class(ImpExportAgr)
-        
-# This allows you to run the script directly from blenders text editor
-# to test the addon without having to install it.
-if __name__ == "__main__":
-    register()
+#def register():
+#    bpy.utils.register_class(ImpExportAgr)
+#    bpy.types.TOPBAR_MT_file_import.append(ImpExportAgr.menu_draw_import)
+#    
+#def unregister():
+#    bpy.types.TOPBAR_MT_file_import.remove(ImpExportAgr.menu_draw_import)
+#    bpy.utils.unregister_class(ImpExportAgr)
+#        
+## This allows you to run the script directly from blenders text editor
+## to test the addon without having to install it.
+#if __name__ == "__main__":
+#    register()
