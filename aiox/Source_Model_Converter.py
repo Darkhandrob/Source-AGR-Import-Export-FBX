@@ -1,15 +1,15 @@
-# CSGO Model Converter to FBX by Darkhand
+# Source Model Converter to FBX by Darkhand
 # https://github.com/Darkhandrob
 # https://www.youtube.com/user/Darkhandrob
 # https://twitter.com/Darkhandrob
-# Last change: 15.03.2019
+# Last change: 17.03.2019
 
 import bpy,time,os
 
-class CSModelConverter(bpy.types.Operator):
+class SModelConverter(bpy.types.Operator):
     """Converts qc-models and smd-animations to FBX"""      # blender will use this as a tooltip for menu items and buttons.
-    bl_idname = "aiox.csgo_model_converter"     # unique identifier for buttons and menu items to reference.
-    bl_label = "CSGO Model Converter"         # display name in the interface.
+    bl_idname = "aiox.source_model_converter"     # unique identifier for buttons and menu items to reference.
+    bl_label = "Source Model Converter"         # display name in the interface.
     bl_options = {'REGISTER', 'UNDO'}  # enable undo for the operator.
     
     # Properties used by the file browser
@@ -17,7 +17,7 @@ class CSModelConverter(bpy.types.Operator):
     
     def menu_draw_convert(self, context):
         layout = self.layout
-        layout.operator("aiox.csgo_model_converter", text="CSGO Model Converter")
+        layout.operator("aiox.source_model_converter", text="Source Model Converter")
     
     # Layout for the properties of the file browser
     def draw(self, context):
@@ -59,8 +59,8 @@ class CSModelConverter(bpy.types.Operator):
         default=False,
     )
     convApexLegFiles: bpy.props.BoolProperty(
-        name="Convert Apex Legends Files",
-        description="Converts only folder which starts with pilot_, pov_, ptpov_ und w_",
+        name="Converts specific Apex Legends Files",
+        description="Converts only files which starts with pilot_, pov_, ptpov_ und w_",
         default=False,
     )
         
@@ -85,7 +85,7 @@ class CSModelConverter(bpy.types.Operator):
         # End
         print("Converting Models finished.")
         print(" ")
-        print ("CSGO Model Converter finished in %.4f sec." % (time.time() - time_start))
+        print ("Source Model Converter finished in %.4f sec." % (time.time() - time_start))
         return {'FINISHED'} 
     
     def FixArms(self, MdlName):
@@ -135,23 +135,16 @@ class CSModelConverter(bpy.types.Operator):
     def ApexScanFolder(self, ModelPath):
         # Listing all Elements in the Directory
         FolderList = os.listdir(ModelPath)
-        QC_Exists = False
         # If Folderlist exists
         if FolderList:
-            # Check if a QC File Exists
-            for FolderItem in FolderList:
-                if FolderItem.endswith(".qc"):
-                    QC_Exists = True
             # Splitting Directories and Files
             for FolderItem in FolderList:
                 SubFolder = os.path.join(ModelPath, FolderItem)
-                if os.path.isdir(SubFolder) and (FolderItem.startswith("pilot_") or FolderItem.startswith("pov_") 
-                or FolderItem.startswith("ptpov_") or FolderItem.startswith("w_") ):
+                if os.path.isdir(SubFolder):
                     # Scan Sub-Folder
                     self.ApexScanFolder(SubFolder)
-                if QC_Exists and self.convMdl and FolderItem.endswith(".qc"):
-                    self.ImportCSModels(SubFolder, ModelPath, False)
-                if not QC_Exists and self.convAnim and FolderItem.endswith(".smd"):
+                if FolderItem.endswith(".smd") and (FolderItem.startswith("pilot_") or FolderItem.startswith("pov_") 
+                    or FolderItem.startswith("ptpov_") or FolderItem.startswith("w_") ):
                     self.ImportCSModels(SubFolder, ModelPath, True)
     
     def ImportCSModels(self, QCFile, ModelPath, ImpAnim):
@@ -229,12 +222,12 @@ class CSModelConverter(bpy.types.Operator):
         
         
 #def register():
-#    bpy.utils.register_class(CSModelConverter)
-#    bpy.types.TOPBAR_MT_file_import.append(CSModelConverter.menu_draw_convert)
+#    bpy.utils.register_class(SModelConverter)
+#    bpy.types.TOPBAR_MT_file_import.append(SModelConverter.menu_draw_convert)
 #    
 #def unregister():
-#    bpy.types.TOPBAR_MT_file_import.remove(CSModelConverter.menu_draw_convert)
-#    bpy.utils.unregister_class(CSModelConverter)
+#    bpy.types.TOPBAR_MT_file_import.remove(SModelConverter.menu_draw_convert)
+#    bpy.utils.unregister_class(SModelConverter)
 #     
 ## This allows you to run the script directly from blenders text editor
 ## to test the addon without having to install it.

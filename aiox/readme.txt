@@ -7,11 +7,12 @@ Features:
 - fixes "record invisible"-option through merging run-animations and ragdoll-animations together
 - deletes useless physics for moviemaking
 - exports every animation as .fbx
-- converts decompiled models as fbx
+- converts decompiled models(.smd and .qc) as fbx
 
 Installation:
 You first need to install Blender Source Tools
-( http://steamreview.org/BlenderSourceTools/ ) and HLAE's afx-blender-scripts
+( https://github.com/Artfunkel/BlenderSourceTools/tree/master/io_scene_valvesource ) 
+and HLAE's afx-blender-scripts
 ( https://github.com/advancedfx/afx-blender-scripts/releases )
 After that you can install and activate this addon.
 
@@ -34,7 +35,7 @@ If you want to do other customisations and delete some models or use not all key
 then you can use the "File"->"Export"->"AGR Export FBX", which will only delete physics and
 export every model with its childrens.
 
-Usage for "CSGO Model Converter":
+Usage for "Source Model Converter":
 
 The animation needs a model on which to apply to in UE4. This script goes through all the folders and subfolders of the inputted filepath(usually the decompiled source files)
 and converts every smd file as a fbx. If a .qc file is present in the folder, the script only imports this file instead to support combined models.
@@ -98,3 +99,7 @@ v1.5.0(03.02.2019)
 
 v1.5.1(15.03.2019)
 - added option in Model Converter to convert Apex Legends files
+
+v1.5.2(17.03.2019)
+- renamed CSGO Model Converter to Source Model Converter because of Apex Legends files
+- removed dependency to have "Import Animations" on, when converting Apex Legends files

@@ -2,10 +2,10 @@
 # https://github.com/Darkhandrob
 # https://www.youtube.com/user/Darkhandrob
 # https://twitter.com/Darkhandrob
-# Last change: 15.03.2019
+# Last change: 17.03.2019
 
 bl_info = {
-    "name": "CSGO AGR Importer to FBX Exporter(AIOX)",
+    "name": "Source AGR Importer to FBX Exporter(AIOX)",
     "category": "Import-Export",
     "author": "Darkhand",
     "version": (1, 5, 1),
@@ -16,7 +16,7 @@ bl_info = {
 
 import bpy
 
-from . import Agr_Import_Export_FBX, Agr_Export_FBX, CSGO_Model_Converter
+from . import Agr_Import_Export_FBX, Agr_Export_FBX, Source_Model_Converter
 
 def menu_draw_import(self, context):
     self.layout.operator("aiox.import_agr_to_fbx", text="AGR Import and Export FBX")
@@ -25,12 +25,12 @@ def menu_draw_export(self, context):
     self.layout.operator("aiox.agr_to_fbx", text="AGR Export FBX")
     
 def menu_draw_convert(self, context):
-    self.layout.operator("aiox.csgo_model_converter", text="Convert CSGO Models to FBX")
+    self.layout.operator("aiox.source_model_converter", text="Convert Source Models to FBX")
     
 classes = (
     Agr_Import_Export_FBX.ImpExportAgr,
     Agr_Export_FBX.ExportAgr,
-    CSGO_Model_Converter.CSModelConverter
+    Source_Model_Converter.SModelConverter
 )
 
 def register():
