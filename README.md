@@ -8,7 +8,7 @@ Also has a option to convert Apex Legends .smd models to fbx.
 - fixes "record invisible"-option through merging run-animations and ragdoll-animations together
 - deletes useless physics for moviemaking
 - exports every animation as .fbx
-- converts decompiled models as fbx
+- converts decompiled models(.smd and .qc) as fbx
 
 ## [Downloads are on the release page](https://github.com/Darkhandrob/CSGO-AGR-Import-Export-FBX/releases)
 
