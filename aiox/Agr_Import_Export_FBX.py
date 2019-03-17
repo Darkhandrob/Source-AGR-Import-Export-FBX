@@ -142,7 +142,7 @@ class ImpExportAgr(bpy.types.Operator):
             bpy.data.objects.remove(PlayerAnims[i][1])
             PlayerAnims[i][0].name = PlayerAnims[i][0].name + "RunAndDeathAnim"
             
-        print("Merging Run and DeathAimation finished")
+        print("Merging Run and DeathAnimation finished")
     
     # Open the filebrowser with the custom properties
     def invoke(self, context, event):
