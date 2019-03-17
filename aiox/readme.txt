@@ -101,5 +101,4 @@ v1.5.1(15.03.2019)
 - added option in Model Converter to convert Apex Legends files
 
 v1.5.2(17.03.2019)
-- renamed CSGO Model Converter to Source Model Converter because of Apex Legends files
-- removed dependency to have "Import Animations" on, when converting Apex Legends files
+- removed option in Model Converter for Apex and created a new script speficic for Apex Legends
