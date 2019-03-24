@@ -116,11 +116,19 @@ class ALModelConverter(bpy.types.Operator):
                 # Delete Physics
                 if i.name.find("physics") != -1:
                     bpy.data.objects.remove(i)
+            # Delete smd_bone_vis
+            if i.name.find("smd_bone_vis") != -1:
+        
+                bpy.data.objects.remove(i)
         else:
             for i in bpy.data.objects: 
                 # Delete Physics
                 if i.name.find("physics") != -1:
                     bpy.data.objects.remove(i)
+            # Delete smd_bone_vis
+            if i.name.find("smd_bone_vis") != -1:
+        
+                bpy.data.objects.remove(i)
                 
         # Create Directory
         NewModelPath = ModelPath.split(self.filepath)[1]
