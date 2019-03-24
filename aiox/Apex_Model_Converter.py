@@ -40,7 +40,7 @@ class ALModelConverter(bpy.types.Operator):
         description="Scales models and animations",
         min=0.000001, max=100000.0,
         soft_min=0.01, soft_max=1.0,
-        default=1,
+        default=0.01,
     )
     invSubfld: bpy.props.BoolProperty(
         name="Invert folder for each model",
