@@ -102,3 +102,7 @@ v1.5.1(15.03.2019)
 
 v1.5.2(17.03.2019)
 - removed option in Model Converter for Apex and created a new script speficic for Apex Legends
+
+v1.5.3(26.03.2019)
+Devostated:
+- added deletion of a sphere, which is created by Blender Source Tools
