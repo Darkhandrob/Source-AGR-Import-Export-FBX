@@ -81,23 +81,23 @@ class CSModelConverter(bpy.types.Operator):
     
     def FixArms(self, MdlName):
         bpy.ops.object.mode_set(mode='OBJECT')
-        bpy.data.armatures[0].bones['v_weapon.Bip01_L_Forearm'].select_set(1)
-        bpy.data.armatures[0].bones['v_weapon.Bip01_R_Forearm'].select_set(1)
+        bpy.data.armatures[0].bones['v_weapon.Bip01_L_Forearm'].select = 1
+        bpy.data.armatures[0].bones['v_weapon.Bip01_R_Forearm'].select = 1
         # ctm_heavy arms dont have ForeTwists bones
         if not MdlName.endswith("_heavy"):
-            bpy.data.armatures[0].bones['v_weapon.Bip01_L_ForeTwist'].select_set(1)
-            bpy.data.armatures[0].bones['v_weapon.Bip01_R_ForeTwist'].select_set(1)
+            bpy.data.armatures[0].bones['v_weapon.Bip01_L_ForeTwist'].select = 1
+            bpy.data.armatures[0].bones['v_weapon.Bip01_R_ForeTwist'].select = 1
         bpy.ops.object.mode_set(mode='EDIT')
         bpy.ops.armature.parent_clear()
         bpy.ops.object.mode_set(mode='OBJECT')
-        bpy.data.armatures[0].bones['v_weapon.Bip01_L_Forearm'].select_set(0)
-        bpy.data.armatures[0].bones['v_weapon.Bip01_R_Forearm'].select_set(0)
+        bpy.data.armatures[0].bones['v_weapon.Bip01_L_Forearm'].select = 0
+        bpy.data.armatures[0].bones['v_weapon.Bip01_R_Forearm'].select = 0
         if not MdlName.endswith("_heavy"):
-            bpy.data.armatures[0].bones['v_weapon.Bip01_L_ForeTwist'].select_set(0)
-            bpy.data.armatures[0].bones['v_weapon.Bip01_R_ForeTwist'].select_set(0)
-        bpy.data.armatures[0].bones['v_weapon'].select_set(1)
+            bpy.data.armatures[0].bones['v_weapon.Bip01_L_ForeTwist'].select = 0
+            bpy.data.armatures[0].bones['v_weapon.Bip01_R_ForeTwist'].select = 0
+        bpy.data.armatures[0].bones['v_weapon'].select = 1
         for bones in bpy.data.armatures[0].bones['v_weapon'].children_recursive:
-            bones.select_set(1)
+            bones.select = 1
         bpy.ops.object.mode_set(mode='EDIT')
         bpy.ops.armature.delete()
         bpy.ops.object.mode_set(mode='OBJECT')
@@ -135,6 +135,7 @@ class CSModelConverter(bpy.types.Operator):
             if i.name.find("physics") != -1:
         
                 bpy.data.objects.remove(i)
+        for i in bpy.data.objects: 
             # Delete smd_bone_vis
             if i.name.find("smd_bone_vis") != -1:
         
@@ -199,7 +200,9 @@ class CSModelConverter(bpy.types.Operator):
         for MdlMeshes in bpy.data.meshes:
             bpy.data.meshes.remove(MdlMeshes)
         for MdlMaterials in bpy.data.materials:
-            bpy.data.materials.remove(MdlMaterials)    
+            bpy.data.materials.remove(MdlMaterials)
+        for MdlCollection in bpy.data.collections:
+            bpy.data.collections.remove(MdlCollection)    
         
         
 #def register():
