@@ -106,3 +106,8 @@ v1.5.2(17.03.2019)
 v1.5.3(26.03.2019)
 Devostated:
 - added deletion of a sphere, which is created by Blender Source Tools
+
+v1.5.4(30.03.2019)
+Model Converter:
+- moved deletion of sphere to its own for-Loop
+- adjusted selection of bones to new api

@@ -2,7 +2,7 @@
 # https://github.com/Darkhandrob
 # https://www.youtube.com/user/Darkhandrob
 # https://twitter.com/Darkhandrob
-# Last change: 17.03.2019
+# Last change: 30.03.2019
 
 import bpy,time,os
 
@@ -116,10 +116,12 @@ class ALModelConverter(bpy.types.Operator):
                 # Delete Physics
                 if i.name.find("physics") != -1:
                     bpy.data.objects.remove(i)
+                    
+            for i in bpy.data.objects: 
             # Delete smd_bone_vis
-            if i.name.find("smd_bone_vis") != -1:
-        
-                bpy.data.objects.remove(i)
+                if i.name.find("smd_bone_vis") != -1:
+                    bpy.data.objects.remove(i)
+                
         else:
             for i in bpy.data.objects: 
                 # Delete Physics
