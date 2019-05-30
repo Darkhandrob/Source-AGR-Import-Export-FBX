@@ -2,13 +2,13 @@
 # https://github.com/Darkhandrob
 # https://www.youtube.com/user/Darkhandrob
 # https://twitter.com/Darkhandrob
-# Last change: 30.03.2019
+# Last change: 29.05.2019
 
 bl_info = {
     "name": "Source AGR Importer to FBX Exporter(AIOX)",
     "category": "Import-Export",
     "author": "Darkhand",
-    "version": (1, 5, 4),
+    "version": (1, 5, 5),
     "blender": (2, 80, 0),
     "description": "Imports AGR and Exports every animation as its own FBX",
     "location": "File > Import/Export"

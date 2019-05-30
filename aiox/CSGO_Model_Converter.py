@@ -205,15 +205,15 @@ class CSModelConverter(bpy.types.Operator):
             bpy.data.collections.remove(MdlCollection)    
         
         
-#def register():
-#    bpy.utils.register_class(CSModelConverter)
-#    bpy.types.TOPBAR_MT_file_import.append(CSModelConverter.menu_draw_convert)
-#    
-#def unregister():
-#    bpy.types.TOPBAR_MT_file_import.remove(CSModelConverter.menu_draw_convert)
-#    bpy.utils.unregister_class(CSModelConverter)
-#     
-## This allows you to run the script directly from blenders text editor
-## to test the addon without having to install it.
-#if __name__ == "__main__":
-#    register()
+def register():
+    bpy.utils.register_class(CSModelConverter)
+    bpy.types.TOPBAR_MT_file_import.append(CSModelConverter.menu_draw_convert)
+    
+def unregister():
+    bpy.types.TOPBAR_MT_file_import.remove(CSModelConverter.menu_draw_convert)
+    bpy.utils.unregister_class(CSModelConverter)
+     
+# This allows you to run the script directly from blenders text editor
+# to test the addon without having to install it.
+if __name__ == "__main__":
+    register()

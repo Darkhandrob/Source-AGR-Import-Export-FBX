@@ -2,7 +2,7 @@
 # https://github.com/Darkhandrob
 # https://www.youtube.com/user/Darkhandrob
 # https://twitter.com/Darkhandrob
-# Last change: 02.02.2019
+# Last change: 30.05.2019
 
 import bpy,time,os
 
@@ -10,7 +10,7 @@ class ImpExportAgr(bpy.types.Operator):
     """Imports .agr and exports every animation as a fbx"""      # blender will use this as a tooltip for menu items and buttons.
     bl_idname = "aiox.import_agr_to_fbx"     # unique identifier for buttons and menu items to reference.
     bl_label = "CSGO AGR Import-Export FBX"         # display name in the interface.
-    bl_options = {'REGISTER', 'UNDO'}  # enable undo for the operator.
+    bl_options = {'REGISTER', 'UNDO', 'PRESET'}  # enable undo for the operator.
     
     # Properties used by the file browser
     filepath: bpy.props.StringProperty(subtype="FILE_PATH")
@@ -24,6 +24,10 @@ class ImpExportAgr(bpy.types.Operator):
     # Layout for the Properties of the file Browser
     def draw(self, context):
         layout = self.layout
+        row = layout.row(align=True)
+        
+        #row.menu()
+        row.operator
         box_import = layout.box()
         box_import.prop(self, "frameRate")
         box_import.prop(self, "framerateBase") 
@@ -93,40 +97,43 @@ class ImpExportAgr(bpy.types.Operator):
     )
     
     def MergeInvAnims(self, context):
-        # Ragdollanimation .hide_render is set as True at Frame 1
-        # But if he was killed before starting recording, it is also the Ragdoll is False and Run is True
-        # Each Type of Model gets its own Array inside the Array
-        PlayerAnims = []
+        # The hide_render channel of the Ragdollanimation is set as 1.0=true at Frame 1,
+        # if someone was killed before the recording started, his hide_render channel is 0.0=False
         
+        PlayerAnims = [] # Each type of model gets its own array inside this array
+        
+        # Find first Ragdoll and then Run Animation
         for CurrMdl in bpy.data.objects:
-            # Find Player Models
+            # Find Player Models (which are named tm or ctm)
             if (CurrMdl.name.find("afx.") != -1 and CurrMdl.name.find("tm") != -1):
                 
-                # Find RagdollAnimation and Changing Point 
-                CurrHideRender = CurrMdl.animation_data.action.fcurves[0]
-                if CurrHideRender.keyframe_points[1].co[0] > 1.0:
-                    ChgKeyframe = int(CurrHideRender.keyframe_points[1].co[0])
+                # Find Ragdoll Animation and Changing Point of hide_render channel
+                CurrHideRender = CurrMdl.animation_data.action.fcurves[0].keyframe_points
+                if CurrHideRender[1].co[0] > 1.0:
+                    ChgKeyframe = int(CurrHideRender[1].co[0])
+                    print("Ragdoll Animation found in "+CurrMdl.name)
                     
-                    # Find RunAnimation
+                    # Find Run Animation
                     for CurrSecMdl in bpy.data.objects:
                         if CurrMdl.name.find("afx.") != -1:
-                            # Dont use the same object-model
-                            if CurrSecMdl.name.find(CurrMdl.name.split()[1]) != -1 and not CurrMdl == CurrSecMdl:
+                            if CurrSecMdl.name.find(CurrMdl.name.split()[1]) != -1 and not CurrMdl == CurrSecMdl: # Dont use the same object-model
                                 
-                                # Runanimation is shown on the second keyframe and hidden on the ChangingKeyframe
                                 SecHideRender = CurrSecMdl.animation_data.action.fcurves[0].keyframe_points
-                                if SecHideRender[ChgKeyframe].co[1] == 1.0 and SecHideRender[ChgKeyframe-1].co[1] == 0.0:
-                                    # Finish 
-                                    PlayerAnims.append([CurrSecMdl,CurrMdl])
+                                if len(SecHideRender) >= ChgKeyframe:
+                                    
+                                    # Run Animation is shown on the second keyframe and hidden on the ChangingKeyframe
+                                    if SecHideRender[ChgKeyframe].co[1] == 1.0 and SecHideRender[ChgKeyframe-1].co[1] == 0.0:
+                                        PlayerAnims.append([CurrSecMdl,CurrMdl]) #Add pair of animations to array
                                                                                          
-        # Edit Animation-strips
+        # Edit animation-strips
         for i in range(len(PlayerAnims)):
+            print("Death Animation found in "+PlayerAnims[i][0].name+" and corresponding Run Animation found in "+ PlayerAnims[i][1].name+"\n")
             RagdollStart = PlayerAnims[i][1].animation_data.action.fcurves[1].range()[0] 
             PlayerAnims[i][1].keyframe_delete(data_path="hide_render", frame=0.0)
             RunDataAnim = PlayerAnims[i][0].animation_data.action
             RagdollDataAnim = PlayerAnims[i][1].animation_data.action
             
-            # Push Action down to new Strip
+            # Push action down to new strip
             PlayerAnims[i][0].animation_data_clear()
             PlayerAnims[i][0].animation_data_create()
             ComplAnim = PlayerAnims[i][0].animation_data.nla_tracks.new()
@@ -142,23 +149,19 @@ class ImpExportAgr(bpy.types.Operator):
             bpy.data.objects.remove(PlayerAnims[i][1])
             PlayerAnims[i][0].name = PlayerAnims[i][0].name + "RunAndDeathAnim"
             
-        print("Merging Run and DeathAnimation finished")
+        print("Merging Run and Death Animation finished\n")
     
     # Open the filebrowser with the custom properties
     def invoke(self, context, event):
         context.window_manager.fileselect_add(self)
         return {'RUNNING_MODAL'}
     
-    # Main funktion
-    def execute(self, context):
-        # Timing Runtime
-        time_start = time.time()
-        # Change Framerate of Scene
-        bpy.context.scene.render.fps = self.frameRate
-        bpy.context.scene.render.fps_base = self.framerateBase
+    def mainFkt(self, context, filepath):
+         
+        time_file = time.time()
         # Import agr with input filepath
         bpy.ops.advancedfx.agrimporter(
-            filepath=self.filepath,
+            filepath=filepath,
             assetPath=self.assetPath,
             interKey =self.interKey,
             global_scale = self.global_scale,
@@ -168,11 +171,11 @@ class ImpExportAgr(bpy.types.Operator):
         )
         # Create Directory
         if not self.exportingPath:
-            NewExportPath = os.path.join(os.path.dirname(self.filepath), bpy.path.display_name_from_filepath(self.filepath))
+            NewExportPath = os.path.join(os.path.dirname(filepath), bpy.path.display_name_from_filepath(filepath))
         else:
-            NewExportPath = os.path.join(self.exportingPath, bpy.path.display_name_from_filepath(self.filepath))
+            NewExportPath = os.path.join(self.exportingPath, bpy.path.display_name_from_filepath(filepath))
         os.makedirs(name=NewExportPath, exist_ok=True)
-        self.exportingPath = NewExportPath
+        exportingPath = NewExportPath
         
         # Execute method
         self.MergeInvAnims(context)
@@ -200,7 +203,7 @@ class ImpExportAgr(bpy.types.Operator):
                 CurrMdl.name = "root"
                 # export single object as fbx
                 CurrentObjectName = CurrObjName.split()[1] + " " +  CurrObjName.split()[0]
-                fullfiles = self.exportingPath + "/" + CurrentObjectName + ".fbx"
+                fullfiles = exportingPath + "/" + CurrentObjectName + ".fbx"
                 NumberMdl += 1
                 bpy.ops.export_scene.fbx(
                     filepath = fullfiles, 
@@ -221,7 +224,7 @@ class ImpExportAgr(bpy.types.Operator):
         #export camera
         if bpy.data.objects.find("afxCam") != -1:
             bpy.data.objects["afxCam"].select_set(1)
-            fullfiles_cam = self.exportingPath + "/afxcam.fbx"
+            fullfiles_cam = exportingPath + "/afxcam.fbx"
             bpy.ops.export_scene.fbx(
                 filepath = fullfiles_cam, 
                 use_selection = True, 
@@ -233,19 +236,62 @@ class ImpExportAgr(bpy.types.Operator):
             
         print("Exporting Camera Finished.")
         print(" ")
+        print ("Export of AGR-File finished in %.4f sec." % (time.time() - time_file))
+        print(" ")
+        
+    # Main funktion
+    def execute(self, context):
+        # Timing Runtime
+        time_start = time.time()
+        
+        # Change Framerate of Scene
+        bpy.context.scene.render.fps = self.frameRate
+        bpy.context.scene.render.fps_base = self.framerateBase
+        
+        # Batch import and export if no file is selected
+        if self.filepath.endswith("\\"):
+            for File in os.listdir(self.filepath):
+                if File.endswith(".agr"):
+                    self.mainFkt(filepath = os.path.join(self.filepath, File), context = context)
+                    
+                    # Cleanup
+                    for MdlObjects in bpy.data.objects:
+                        bpy.data.objects.remove(MdlObjects)
+                    for MdlActions in bpy.data.actions:
+                        bpy.data.actions.remove(MdlActions)
+                    for MdlArmatures in bpy.data.armatures:
+                        bpy.data.armatures.remove(MdlArmatures)
+                    for MdlMeshes in bpy.data.meshes:
+                        bpy.data.meshes.remove(MdlMeshes)
+                    for MdlMaterials in bpy.data.materials:
+                        bpy.data.materials.remove(MdlMaterials)
+                    for MdlCollection in bpy.data.collections:
+                        bpy.data.collections.remove(MdlCollection)  
+        else:
+            self.mainFkt(filepath = self.filepath, context = context)
+        
         print ("FBX-Export script finished in %.4f sec." % (time.time() - time_start))
         return {'FINISHED'} 
     
+
+
+classes = (
+    ImpExportAgr,
+    )
+
+
+def register():
+    for cls in classes:
+        bpy.utils.register_class(cls)
+    bpy.types.TOPBAR_MT_file_import.append(ImpExportAgr.menu_draw_import)
+
+
+def unregister():
+    for cls in classes:
+        bpy.utils.unregister_class(cls)
+    bpy.types.TOPBAR_MT_file_import.remove(ImpExportAgr.menu_draw_import)
+
+
+if __name__ == "__main__":
+    register()
     
-#def register():
-#    bpy.utils.register_class(ImpExportAgr)
-#    bpy.types.TOPBAR_MT_file_import.append(ImpExportAgr.menu_draw_import)
-#    
-#def unregister():
-#    bpy.types.TOPBAR_MT_file_import.remove(ImpExportAgr.menu_draw_import)
-#    bpy.utils.unregister_class(ImpExportAgr)
-#        
-## This allows you to run the script directly from blenders text editor
-## to test the addon without having to install it.
-#if __name__ == "__main__":
-#    register()

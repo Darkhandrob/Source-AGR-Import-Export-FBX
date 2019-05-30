@@ -27,11 +27,12 @@ Usage for "AGR Import and Export FBX":
 3.Input the path to the CSGO folder with decompiled models and a path, where to export it.
 4.Open "Window" -> "Toggle System Console" to check the status of the programm, because it will 
   become unresponsive while running the addon.
-5.Finally open the .agr file and let the programm do its work
+5.Finally open the .agr file or make sure to leave the field for the file empty to batch import the whole folder and let the programm do its work
 
 Usage for "AGR Export FBX":
 
-If you want to do other customisations and delete some models or use not all keyframes, 
+If you
+ want to do other customisations and delete some models or use not all keyframes, 
 then you can use the "File"->"Export"->"AGR Export FBX", which will only delete physics and
 export every model with its childrens.
 
@@ -111,3 +112,9 @@ v1.5.4(30.03.2019)
 Model Converter:
 - moved deletion of sphere to its own for-Loop
 - adjusted selection of bones to new api
+
+v1.5.5(29.05.2019)
+AGR Import and Export FBX:
+- added option to batch import a folder with AGRs
+- fixed index out of bounds error in merging animations process
+- added preset funktion
