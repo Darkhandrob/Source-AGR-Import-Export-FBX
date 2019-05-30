@@ -128,8 +128,8 @@ class ALModelConverter(bpy.types.Operator):
                 if i.name.find("physics") != -1:
                     bpy.data.objects.remove(i)
             # Delete smd_bone_vis
-			for i in bpy.data.objects:
-				if i.name.find("smd_bone_vis") != -1:
+            for i in bpy.data.objects:
+                if i.name.find("smd_bone_vis") != -1:
                     bpy.data.objects.remove(i)
                 
         # Create Directory
