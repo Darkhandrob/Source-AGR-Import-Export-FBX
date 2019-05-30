@@ -81,13 +81,13 @@ class ExportAgr(bpy.types.Operator):
 
 def register():
     bpy.utils.register_class(ExportAgr)
-#    bpy.types.TOPBAR_MT_file_export.append(ExportAgr.menu_draw_export)
-#    
+    bpy.types.TOPBAR_MT_file_export.append(ExportAgr.menu_draw_export)
+   
 def unregister():
-#    bpy.types.TOPBAR_MT_file_export.remove(ExportAgr.menu_draw_export)
+    bpy.types.TOPBAR_MT_file_export.remove(ExportAgr.menu_draw_export)
     bpy.utils.unregister_class(ExportAgr)
-#        
+       
 ## This allows you to run the script directly from blenders text editor
 ## to test the addon without having to install it.
-#if __name__ == "__main__":
-#    register()
+if __name__ == "__main__":
+    register()
