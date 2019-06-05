@@ -2,7 +2,7 @@
 # https://github.com/Darkhandrob
 # https://www.youtube.com/user/Darkhandrob
 # https://twitter.com/Darkhandrob
-# Last change: 30.03.2019
+# Last change: 01.06.2019
 
 import bpy,time,os
 
@@ -28,6 +28,7 @@ class CSModelConverter(bpy.types.Operator):
         box_export.prop(self, "chngScale")
         box_export.prop(self, "exportingPath")
         box_export.prop(self, "invSubfld")
+        box_export.prop(self, "renMatName")
     
     # Custom properties 
     exportingPath: bpy.props.StringProperty(
@@ -55,6 +56,11 @@ class CSModelConverter(bpy.types.Operator):
     invSubfld: bpy.props.BoolProperty(
         name="Invert folder for each model",
         description="Moves all files one folder up in the hierarchy; not recommended if animations should be converted too",
+        default=False,
+    )
+    renMatName: bpy.props.BoolProperty(
+        name="Rename material slots",
+        description="Adds '_mat' to the material slot names to support the HammUer materials importer",
         default=False,
     )
         
@@ -101,6 +107,11 @@ class CSModelConverter(bpy.types.Operator):
         bpy.ops.object.mode_set(mode='EDIT')
         bpy.ops.armature.delete()
         bpy.ops.object.mode_set(mode='OBJECT')
+    
+    def RenameMaterialNames(self):
+        for Mdls in bpy.data.objects:
+            for Mats in Mdls.material_slots:
+                Mats.material.name = Mats.material.name + "_mat"
         
     def ScanFolder(self, ModelPath):
         # Listing all Elements in the Directory
@@ -150,6 +161,9 @@ class CSModelConverter(bpy.types.Operator):
         os.makedirs(name=CurrentExportingPath, exist_ok=True)
         
         MdlName = bpy.path.display_name_from_filepath(QCFile)
+        
+        if self.renMatName:
+            self.RenameMaterialNames()
         
         if MdlName.startswith("v_glove") or MdlName.startswith("v_sleeve") or MdlName.startswith("v_bare"):    
             if self.convMdl:
