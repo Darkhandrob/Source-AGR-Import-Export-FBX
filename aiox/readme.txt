@@ -118,3 +118,10 @@ AGR Import and Export FBX:
 - added option to batch import a folder with AGRs
 - fixed index out of bounds error in merging animations process
 - added preset funktion
+
+v1.5.6(05.06.2019)
+AGR Import and Export FBX:
+- fixed exported range of afxCam
+
+Model Converter:
+- added option to rename the material slots which supports the HammUEr naming convention
