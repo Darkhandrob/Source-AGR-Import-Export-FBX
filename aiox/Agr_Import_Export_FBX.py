@@ -2,7 +2,7 @@
 # https://github.com/Darkhandrob
 # https://www.youtube.com/user/Darkhandrob
 # https://twitter.com/Darkhandrob
-# Last change: 05.06.2019
+# Last change: 11.08.2019
 
 import bpy,time,os
 
@@ -35,7 +35,6 @@ class ImpExportAgr(bpy.types.Operator):
 		box_import.prop(self, "interKey")
 		box_import.prop(self, "global_scale")
 		box_import.prop(self, "scaleInvisibleZero")
-		box_import.prop(self, "skipRemDoubles")
 		box_import.prop(self, "onlyBones")
 		
 		box_export = layout.box()
@@ -79,11 +78,6 @@ class ImpExportAgr(bpy.types.Operator):
 		name="Scale invisible to zero",
 		description="If set entities will scaled to zero when not visible.",
 		default=False,
-	)
-	skipRemDoubles: bpy.props.BoolProperty(
-		name="Preserve SMD Polygons & Normals",
-		description="Import raw (faster), disconnected polygons from SMD files; these are harder to edit but a closer match to the original mesh",
-		default=True,
 	)
 	onlyBones: bpy.props.BoolProperty(
 		name="Bones (skeleton) only",
@@ -166,7 +160,6 @@ class ImpExportAgr(bpy.types.Operator):
 			interKey =self.interKey,
 			global_scale = self.global_scale,
 			scaleInvisibleZero=self.scaleInvisibleZero,
-			skipRemDoubles=self.skipRemDoubles,
 			onlyBones=self.onlyBones
 		)
 		# Create Directory
@@ -205,6 +198,7 @@ class ImpExportAgr(bpy.types.Operator):
 				CurrentObjectName = CurrObjName.split()[1] + " " +  CurrObjName.split()[0]
 				fullfiles = exportingPath + "/" + CurrentObjectName + ".fbx"
 				NumberMdl += 1
+				bpy.context.scene.frame_start = 1
 				bpy.ops.export_scene.fbx(
 					filepath = fullfiles, 
 					use_selection = True, 
@@ -226,6 +220,7 @@ class ImpExportAgr(bpy.types.Operator):
 			bpy.data.objects["afxCam"].select_set(1)
 			bpy.context.scene.frame_end = bpy.data.objects["afxCam"].animation_data.action.frame_range[1]
 			fullfiles_cam = exportingPath + "/afxcam.fbx"
+			bpy.context.scene.frame_start = 1
 			bpy.ops.export_scene.fbx(
 				filepath = fullfiles_cam, 
 				use_selection = True, 
