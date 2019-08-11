@@ -11,9 +11,9 @@ Features:
 
 Installation:
 You first need to install Blender Source Tools
-( https://github.com/Artfunkel/BlenderSourceTools/tree/master/io_scene_valvesource ) 
+( http://steamreview.org/BlenderSourceTools/ ) 
 and HLAE's afx-blender-scripts
-( https://github.com/advancedfx/afx-blender-scripts/releases )
+( https://github.com/advancedfx/afx-blender-scripts/ )
 After that you can install and activate this addon.
 
 Important Note:
@@ -27,7 +27,7 @@ Usage for "AGR Import and Export FBX":
 3.Input the path to the CSGO folder with decompiled models and a path, where to export it.
 4.Open "Window" -> "Toggle System Console" to check the status of the programm, because it will 
   become unresponsive while running the addon.
-5.Finally open the .agr file or make sure to leave the field for the file empty to batch import the whole folder and let the programm do its work
+5.Finally open the .agr file or make sure to leave the box for the file empty to batch import the whole folder and let the programm do its work
 
 Usage for "AGR Export FBX":
 
@@ -125,3 +125,8 @@ AGR Import and Export FBX:
 
 Model Converter:
 - added option to rename the material slots which supports the HammUEr naming convention
+
+v1.5.7(11.08.2019)
+AGR Import and Export FBX:
+- update for Blender Source Tools v3.0
+- fixed wrong xy-positioning of camera and models
