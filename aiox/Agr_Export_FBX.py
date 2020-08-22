@@ -62,18 +62,22 @@ class ExportAgr(bpy.types.Operator):
                 for CurrentChildren in CurrentModel.children:
                     CurrentChildren.select_set(0)
 
-            # export camera
-        if bpy.data.objects.find("afxCam") != -1:
-            bpy.data.objects["afxCam"].select_set(1)
-            fullfiles = self.filepath + "/afxcam.fbx"
-            bpy.ops.export_scene.fbx(
-                filepath = fullfiles, 
-                use_selection = True, 
-                bake_anim_use_nla_strips = False, 
-                bake_anim_use_all_actions = False, 
-                bake_anim_simplify_factor = 0,
-                add_leaf_bones=False)
-            bpy.data.objects["afxCam"].select_set(0)
+		# export camera
+		for CameraData in bpy.data.objects:
+			if any(CameraData.name.startswith(c) for c in ("afxCam", "camera")):
+				# select camera
+				CameraData.select_set(1)
+				# export single cameras as fbx
+				fullfiles = self.filepath + "/" + CameraData.name + ".fbx"
+				bpy.ops.export_scene.fbx(
+					filepath = fullfiles, 
+					object_types={'CAMERA'}, 
+					use_selection = True, 
+					bake_anim_use_nla_strips = False, 
+					bake_anim_use_all_actions = False, 
+					bake_anim_simplify_factor = 0)
+				# undo all changes
+				CameraData.select_set(0)
                     
         print(" ")
         print("FBX-Export Script finished in %.4f sec." % (time.time() - time_start))
