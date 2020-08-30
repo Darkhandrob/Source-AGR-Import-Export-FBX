@@ -215,22 +215,22 @@ class ImpExportAgr(bpy.types.Operator):
                 
         print("Exporting "+ str(NumberMdl) +" Models finished.")
             
-		# export camera
-		for CameraData in bpy.data.objects:
-			if any(CameraData.name.startswith(c) for c in ("afxCam", "camera")):
-				# select camera
-				CameraData.select_set(1)
-				# export single cameras as fbx
-				fullfiles = self.filepath + "/" + CameraData.name + ".fbx"
-				bpy.ops.export_scene.fbx(
-					filepath = fullfiles, 
-					object_types={'CAMERA'}, 
-					use_selection = True, 
-					bake_anim_use_nla_strips = False, 
-					bake_anim_use_all_actions = False, 
-					bake_anim_simplify_factor = 0)
-				# undo all changes
-				CameraData.select_set(0)
+        # export camera
+        for CameraData in bpy.data.objects:
+            if any(CameraData.name.startswith(c) for c in ("afxCam", "camera")):
+                # select camera
+                CameraData.select_set(1)
+                # export single cameras as fbx
+                fullfiles = self.filepath + "/" + CameraData.name + ".fbx"
+                bpy.ops.export_scene.fbx(
+                    filepath = fullfiles, 
+                    object_types={'CAMERA'}, 
+                    use_selection = True, 
+                    bake_anim_use_nla_strips = False, 
+                    bake_anim_use_all_actions = False, 
+                    bake_anim_simplify_factor = 0)
+                # undo all changes
+                CameraData.select_set(0)
             
         print("Exporting Camera Finished.")
         print(" ")
