@@ -130,3 +130,7 @@ v1.5.7(11.08.2019)
 AGR Import and Export FBX:
 - update for Blender Source Tools v3.0
 - fixed wrong xy-positioning of camera and models
+
+v1.5.8(30.08.2020)
+AGR Import and Export FBX and Only Export FBX:
+- updated for AGRv5 with multiple cameras export - by Devostated
