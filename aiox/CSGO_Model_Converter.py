@@ -241,7 +241,7 @@ class CSModelConverter(bpy.types.Operator):
         if self.renMatName:
             self.RenameMaterialNames()
 
-        if MdlName.startswith("v_glove") or MdlName.startswith("v_sleeve") or MdlName.startswith("v_bare") or "arms" in MdlName:
+        if MdlName.startswith("v_glove") or MdlName.startswith("v_sleeve") or MdlName.startswith("v_bare") or "_arms" in MdlName:
             if self.convMdl:  # and "arms" not in MdlName
                 # Export as fbx
                 bpy.ops.export_scene.fbx(
